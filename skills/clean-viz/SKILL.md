@@ -1,8 +1,8 @@
 ---
-name: tufte-viz
+name: clean-viz
 description: >
-  Enforces Edward Tufte's data visualization principles whenever creating charts,
-  plots, or visualizations. Triggers on any request involving matplotlib, pyplot,
+  Applies data visualization best practices inspired by Edward Tufte's principles
+  whenever creating charts, plots, or visualizations. Triggers on any request involving matplotlib, pyplot,
   seaborn, plotly, altair, d3, ggplot2, Observable Plot, or general terms like
   "chart", "plot", "graph", "visualization", "figure", "histogram", "scatter",
   "bar chart", "line chart", "heatmap", "sparkline", "dashboard".
@@ -34,9 +34,12 @@ triggers:
   - range frame
 ---
 
-# Tufte Data Visualization Skill
+# Clean Data Visualization Skill
 
-You are now operating under Edward Tufte's data visualization principles. Every chart, plot, or figure you produce MUST follow these rules. There are no exceptions unless the user explicitly overrides a specific rule.
+You are now operating under data visualization best practices inspired by Edward Tufte's principles. Every chart, plot, or figure you produce MUST follow these rules. Deviate only if:
+
+1. The user explicitly overrides a specific rule, **or**
+2. The data genuinely requires it (e.g., negative values in a bar chart, diverging colormaps in a heatmap) — but this applies to less than 0.5% of visualizations. Before deviating, seriously consider whether the standard pattern can be adapted instead. If deviation is truly necessary, state which rule is being bent and why.
 
 ---
 
@@ -88,8 +91,8 @@ Apply ALL of the following to every visualization:
 - **Remove redundant axis labels** — if the title or context makes the axis meaning obvious, omit the label
 
 ### Consistency in Generated Code
-- **Never hardcode font sizes or colors in helper functions** — always reference the defined global constants (e.g., `TUFTE_LABEL_SIZE`, `TUFTE_BLACK`)
-- **Default all label text to `TUFTE_BLACK`** — reserve gray only for intentionally de-emphasized elements (e.g., non-highlighted series in a slope chart)
+- **Never hardcode font sizes or colors in helper functions** — always reference the defined global constants (e.g., `CLEAN_LABEL_SIZE`, `CLEAN_BLACK`)
+- **Default all label text to `CLEAN_BLACK`** — reserve gray only for intentionally de-emphasized elements (e.g., non-highlighted series in a slope chart)
 - **In multi-panel figures**, inconsistent font sizes and label colors are hard to catch visually — using constants prevents this class of bug entirely
 
 ### Multi-Series Differentiation
@@ -116,7 +119,7 @@ Apply ALL of the following to every visualization:
 ## 3. Mandatory Rules — Never Do
 
 ### Banned Chart Types
-Do NOT generate these chart types. If the user requests one, explain the Tufte principle being violated and offer the substitute from the table below.
+Do NOT generate these chart types. If the user requests one, explain the visualization principle being violated and offer the substitute from the table below.
 
 | Requested Type | Problem | Substitute |
 |---|---|---|
@@ -152,14 +155,14 @@ When generating code, load the appropriate reference file for concrete code patt
 ### Python — matplotlib / seaborn
 Read `references/matplotlib-patterns.md` for:
 - Base `rcParams` configuration
-- Color palette and typography constants (`TUFTE_FONT_SIZE`, `TUFTE_LABEL_SIZE`, etc.)
-- Line style cycle (`TUFTE_LINE_STYLES`) for multi-series differentiation
+- Color palette and typography constants (`CLEAN_FONT_SIZE`, `CLEAN_LABEL_SIZE`, etc.)
+- Line style cycle (`CLEAN_LINE_STYLES`) for multi-series differentiation
 - `apply_range_frame()` helper function
 - `pad_axis_for_labels()` — extend xlim without breaking range frames
 - `label_lines_no_overlap()` — collision-aware multi-series labeling
-- `tufte_multi_line_plot()` — multi-series with line style variation
+- `clean_multi_line_plot()` — multi-series with line style variation
 - Direct labeling patterns (single-series)
-- Tufte bar chart (white gridlines)
+- Bar chart (white gridlines)
 - Line plot with dot emphasis (single-series only)
 - Slope chart implementation
 - Sparkline function
@@ -168,7 +171,7 @@ Read `references/matplotlib-patterns.md` for:
 
 ### Python — Plotly
 Read `references/plotly-patterns.md` for:
-- `TUFTE_LAYOUT` base template
+- `CLEAN_LAYOUT` base template
 - Range frame axis configuration
 - Direct annotation patterns
 - Multi-series line chart with line style variation and collision-aware labels
@@ -246,7 +249,7 @@ The patterns in this skill are written for single full-size charts. At reduced p
 When generating multiple charts in a session (e.g., a set of 5 figures for a report or presentation), they will almost certainly be displayed together. Treat them as a unified visual system:
 
 - **Lock the color palette** — use the same color assignments across all charts. If "Revenue" is indigo in chart 1, it must be indigo in every chart
-- **Unify typography** — identical font family, base size, title size, and label size across all figures. Use the global constants (`TUFTE_FONT_SIZE`, `TUFTE_TITLE_SIZE`, etc.)
+- **Unify typography** — identical font family, base size, title size, and label size across all figures. Use the global constants (`CLEAN_FONT_SIZE`, `CLEAN_TITLE_SIZE`, etc.)
 - **Consistent axis styling** — same spine treatment, tick direction, and range-frame approach on every chart. Do not mix range frames and full axes
 - **Match figure dimensions** — use the same `figsize` (or width/height in Plotly) for charts that will sit side by side. Mismatched aspect ratios look accidental
 - **Harmonize data-ink weight** — line widths, marker sizes, and bar widths should be the same across charts unless there is a deliberate reason to differ
@@ -279,9 +282,9 @@ After generating any visualization code, verify it against `references/checklist
 
 If the user explicitly requests a banned element (e.g., "I need a pie chart for this presentation"):
 
-1. Briefly explain the Tufte principle being violated (1-2 sentences)
+1. Briefly explain the visualization principle being violated (1-2 sentences)
 2. Offer the recommended substitute
-3. If the user insists after seeing the alternative, comply but still apply all other Tufte rules (serif font, no chartjunk, grayscale, etc.)
+3. If the user insists after seeing the alternative, comply but still apply all other clean-viz rules (serif font, no chartjunk, grayscale, etc.)
 
 Never silently comply with a banned element on the first request. Always educate first, then defer.
 
@@ -291,7 +294,7 @@ Never silently comply with a banned element on the first request. Always educate
 
 When generating visualization code:
 
-1. State which Tufte principles are being applied (brief, 1-2 lines)
+1. State which visualization principles are being applied (brief, 1-2 lines)
 2. Provide the complete, runnable code
 3. Include a brief note on what was intentionally omitted and why (e.g., "Legend removed: series are directly labeled")
 4. Run through the checklist mentally; note any items that could not be satisfied and why

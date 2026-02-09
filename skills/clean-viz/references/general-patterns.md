@@ -1,6 +1,6 @@
 # General Library Patterns — Altair, D3.js, ggplot2, Observable Plot
 
-Tufte-style patterns for visualization libraries beyond matplotlib and Plotly. Apply the same core principles: maximize data-ink ratio, remove chartjunk, use range frames, direct labeling, and serif typography.
+Clean-viz patterns for visualization libraries beyond matplotlib and Plotly (inspired by Edward Tufte's principles). Apply the same core principles: maximize data-ink ratio, remove chartjunk, use range frames, direct labeling, and serif typography.
 
 ---
 
@@ -11,7 +11,7 @@ Tufte-style patterns for visualization libraries beyond matplotlib and Plotly. A
 ```python
 import altair as alt
 
-def tufte_theme():
+def clean_theme():
     return {
         'config': {
             'view': {'strokeWidth': 0},
@@ -48,15 +48,15 @@ def tufte_theme():
         }
     }
 
-alt.themes.register('tufte', tufte_theme)
-alt.themes.enable('tufte')
+alt.themes.register('clean', clean_theme)
+alt.themes.enable('clean')
 ```
 
 ### Line Chart with Direct Labels
 
 ```python
-def tufte_line_chart(df, x_col, y_col, color_col=None):
-    """Tufte-style line chart in Altair with direct labels."""
+def clean_line_chart(df, x_col, y_col, color_col=None):
+    """Line chart in Altair with direct labels."""
     base = alt.Chart(df).encode(
         x=alt.X(x_col, axis=alt.Axis(grid=False)),
         y=alt.Y(y_col, axis=alt.Axis(grid=False)),
@@ -87,8 +87,8 @@ def tufte_line_chart(df, x_col, y_col, color_col=None):
 ### Bar Chart
 
 ```python
-def tufte_bar_chart(df, x_col, y_col):
-    """Tufte-style bar chart in Altair."""
+def clean_bar_chart(df, x_col, y_col):
+    """Bar chart in Altair."""
     bars = alt.Chart(df).mark_bar(color='#888888').encode(
         x=alt.X(x_col, axis=alt.Axis(grid=False, ticks=False)),
         y=alt.Y(y_col, axis=alt.Axis(grid=False, ticks=False)),
@@ -107,8 +107,8 @@ def tufte_bar_chart(df, x_col, y_col):
 ### Small Multiples (Faceting)
 
 ```python
-def tufte_facet(df, x_col, y_col, facet_col, columns=3):
-    """Tufte-style small multiples via Altair faceting."""
+def clean_facet(df, x_col, y_col, facet_col, columns=3):
+    """Small multiples via Altair faceting."""
     return alt.Chart(df).mark_line(
         strokeWidth=1.2, color='#333333'
     ).encode(
@@ -132,8 +132,8 @@ def tufte_facet(df, x_col, y_col, facet_col, columns=3):
 ### Base Setup
 
 ```javascript
-// Tufte-style D3 defaults
-const TUFTE = {
+// Clean-viz D3 defaults
+const CLEAN = {
   fontFamily: 'Georgia, serif',
   fontSize: 12,
   textColor: '#333333',
@@ -148,7 +148,7 @@ const TUFTE = {
 ### Spine Removal and Axis Styling
 
 ```javascript
-function tufteAxes(svg, xAxis, yAxis, xData, yData) {
+function cleanAxes(svg, xAxis, yAxis, xData, yData) {
   // X axis — bottom only, bounded to data range
   const xAxisGroup = svg.append('g')
     .attr('transform', `translate(0,${height})`)
@@ -167,25 +167,25 @@ function tufteAxes(svg, xAxis, yAxis, xData, yData) {
 
   // Style ticks and labels
   svg.selectAll('.tick text')
-    .style('font-family', TUFTE.fontFamily)
-    .style('font-size', `${TUFTE.fontSize}px`)
-    .style('fill', TUFTE.textColor);
+    .style('font-family', CLEAN.fontFamily)
+    .style('font-size', `${CLEAN.fontSize}px`)
+    .style('fill', CLEAN.textColor);
 
   svg.selectAll('.tick line')
-    .style('stroke', TUFTE.lineColor);
+    .style('stroke', CLEAN.lineColor);
 }
 ```
 
 ### Direct Labeling
 
 ```javascript
-function directLabel(svg, x, y, text, color = TUFTE.textColor) {
+function directLabel(svg, x, y, text, color = CLEAN.textColor) {
   svg.append('text')
     .attr('x', x + 8)
     .attr('y', y)
     .attr('dy', '0.35em')
-    .attr('font-family', TUFTE.fontFamily)
-    .attr('font-size', TUFTE.fontSize)
+    .attr('font-family', CLEAN.fontFamily)
+    .attr('font-size', CLEAN.fontSize)
     .attr('fill', color)
     .text(text);
 }
@@ -196,8 +196,8 @@ function directLabel(svg, x, y, text, color = TUFTE.textColor) {
 For multi-series charts, vary `stroke-dasharray` alongside color:
 
 ```javascript
-const TUFTE_DASHES = ['', '6,3', '6,3,2,3', '2,3'];  // solid, dash, dash-dot, dot
-// Usage: .attr('stroke-dasharray', TUFTE_DASHES[i])
+const CLEAN_DASHES = ['', '6,3', '6,3,2,3', '2,3'];  // solid, dash, dash-dot, dot
+// Usage: .attr('stroke-dasharray', CLEAN_DASHES[i])
 ```
 
 The dot-emphasis technique (below) works for single-series only. For multi-series, use
@@ -206,7 +206,7 @@ line style variation instead — the white mask circles homogenize dots across s
 ### Line Chart with Dot Emphasis (Single Series)
 
 ```javascript
-function tufteLine(svg, data, xScale, yScale, color = TUFTE.lineColor) {
+function cleanLine(svg, data, xScale, yScale, color = CLEAN.lineColor) {
   const line = d3.line()
     .x(d => xScale(d.x))
     .y(d => yScale(d.y));

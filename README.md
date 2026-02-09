@@ -1,10 +1,12 @@
-# tufte-viz-skill
+# clean-viz-skill
 
-A Claude Code plugin that enforces Edward Tufte's data visualization principles. When activated, Claude automatically produces publication-quality, chartjunk-free graphics across any charting library.
+A Claude Code plugin that applies data visualization best practices inspired by Edward Tufte's principles. When activated, Claude automatically produces publication-quality, chartjunk-free graphics across any charting library.
+
+> **Note**: This project is not affiliated with Edward Tufte. It applies visualization principles described in his published works.
 
 ## What it does
 
-This skill auto-triggers whenever you ask Claude to create charts, plots, or visualizations. It applies Tufte's principles:
+This skill auto-triggers whenever you ask Claude to create charts, plots, or visualizations. It applies these principles:
 
 - **Maximizes data-ink ratio** — removes non-data elements (extra spines, heavy gridlines, decorative fills)
 - **Uses range frames** — axis lines span only the data range
@@ -12,7 +14,7 @@ This skill auto-triggers whenever you ask Claude to create charts, plots, or vis
 - **Serif typography** — clean, readable text
 - **Grayscale default** — with a single accent color for emphasis
 - **Bans chartjunk** — no pie charts, 3D effects, dual axes, gradient fills, or rainbow colormaps
-- **Offers substitutes** — when a banned chart type is requested, suggests a Tufte-appropriate alternative
+- **Offers substitutes** — when a banned chart type is requested, suggests a clean alternative
 
 ## Supported libraries
 
@@ -33,23 +35,23 @@ This skill auto-triggers whenever you ask Claude to create charts, plots, or vis
 Inside Claude Code, run:
 
 ```
-/plugin marketplace add maksymsherman/tufte-viz-skill
-/plugin install tufte-viz@maksymsherman-tufte-viz-skill
+/plugin marketplace add maksymsherman/clean-viz-skill
+/plugin install clean-viz@maksymsherman-clean-viz-skill
 ```
 
 You can scope the installation:
 
 ```
-/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope user      # all your projects (default)
-/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope project   # shared with collaborators
-/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope local     # this repo only
+/plugin install clean-viz@maksymsherman-clean-viz-skill --scope user      # all your projects (default)
+/plugin install clean-viz@maksymsherman-clean-viz-skill --scope project   # shared with collaborators
+/plugin install clean-viz@maksymsherman-clean-viz-skill --scope local     # this repo only
 ```
 
 ### From a local clone
 
 ```bash
-git clone https://github.com/maksymsherman/tufte-viz-skill.git
-claude --plugin-dir /path/to/tufte-viz-skill
+git clone https://github.com/maksymsherman/clean-viz-skill.git
+claude --plugin-dir /path/to/clean-viz-skill
 ```
 
 ## How it works
@@ -78,7 +80,7 @@ The plugin has two layers:
 
 **Result:** Claude explains occlusion/perspective problems, generates a clean 2D bar chart.
 
-## Tufte principles applied
+## Visualization principles
 
 Based on Edward Tufte's *The Visual Display of Quantitative Information*:
 

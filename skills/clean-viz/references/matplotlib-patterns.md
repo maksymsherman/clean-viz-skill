@@ -1,6 +1,6 @@
-# Matplotlib & Seaborn — Tufte Patterns
+# Matplotlib & Seaborn — Clean-Viz Patterns
 
-Concrete code patterns for producing Tufte-style visualizations in matplotlib and seaborn. Copy and adapt these patterns when generating visualization code.
+Concrete code patterns for producing clean, publication-quality visualizations in matplotlib and seaborn (inspired by Edward Tufte's principles). Copy and adapt these patterns when generating visualization code.
 
 ---
 
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-# Tufte-style base configuration
+# Clean-viz base configuration
 plt.rcParams.update({
     'font.family': 'serif',
     'font.size': 11,
@@ -44,28 +44,28 @@ plt.rcParams.update({
 ## Color Palette
 
 ```python
-# Tufte grayscale palette (default)
-TUFTE_BLACK = '#333333'
-TUFTE_DARK_GRAY = '#555555'
-TUFTE_MEDIUM_GRAY = '#888888'
-TUFTE_LIGHT_GRAY = '#cccccc'
-TUFTE_FAINT_GRAY = '#eeeeee'
-TUFTE_ACCENT = '#c0392b'  # muted red, for emphasis only
+# Clean-viz grayscale palette (default)
+CLEAN_BLACK = '#333333'
+CLEAN_DARK_GRAY = '#555555'
+CLEAN_MEDIUM_GRAY = '#888888'
+CLEAN_LIGHT_GRAY = '#cccccc'
+CLEAN_FAINT_GRAY = '#eeeeee'
+CLEAN_ACCENT = '#c0392b'  # muted red, for emphasis only
 
 # Typography constants — always reference these instead of hardcoding sizes.
 # These must stay in sync with the rcParams values above.
-TUFTE_FONT_SIZE = 11       # base text and axis labels (matches rcParams font.size)
-TUFTE_TITLE_SIZE = 13      # chart titles (matches rcParams axes.titlesize)
-TUFTE_LABEL_SIZE = 10      # direct labels and annotations
-TUFTE_SMALL_SIZE = 9       # secondary labels, de-emphasized text, small multiples
+CLEAN_FONT_SIZE = 11       # base text and axis labels (matches rcParams font.size)
+CLEAN_TITLE_SIZE = 13      # chart titles (matches rcParams axes.titlesize)
+CLEAN_LABEL_SIZE = 10      # direct labels and annotations
+CLEAN_SMALL_SIZE = 9       # secondary labels, de-emphasized text, small multiples
 
 # Line style cycle — use alongside color to distinguish multi-series lines.
 # Ensures series are distinguishable without color (accessibility, small sizes, print).
-TUFTE_LINE_STYLES = ['solid', 'dashed', (0, (4, 2, 1, 2)), 'dotted']
+CLEAN_LINE_STYLES = ['solid', 'dashed', (0, (4, 2, 1, 2)), 'dotted']
 #                    solid    dashed    dash-dot                dotted
 
 # Colorblind-safe palette (Paul Tol) — use when multiple colors required
-TUFTE_COLORS = [
+CLEAN_COLORS = [
     '#332288',  # indigo
     '#88CCEE',  # cyan
     '#44AA99',  # teal
@@ -85,7 +85,7 @@ Bind spine extents to the actual data range:
 
 ```python
 def apply_range_frame(ax, x, y):
-    """Apply Tufte range frames: spines span only the data range."""
+    """Apply range frames: spines span only the data range."""
     ax.spines['bottom'].set_bounds(min(x), max(x))
     ax.spines['left'].set_bounds(min(y), max(y))
     ax.spines['top'].set_visible(False)
@@ -100,7 +100,7 @@ Usage:
 
 ```python
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(x, y, color=TUFTE_BLACK, linewidth=1.2)
+ax.plot(x, y, color=CLEAN_BLACK, linewidth=1.2)
 apply_range_frame(ax, x, y)
 ax.set_title('Descriptive sentence-case title')
 plt.tight_layout()
@@ -111,24 +111,24 @@ plt.tight_layout()
 ## Direct Labeling (Replace Legends)
 
 ```python
-def label_line(ax, x, y, label, color=TUFTE_BLACK, offset=(5, 0)):
+def label_line(ax, x, y, label, color=CLEAN_BLACK, offset=(5, 0)):
     """Place a text label at the end of a line series."""
     ax.annotate(
         label,
         xy=(x[-1], y[-1]),
         xytext=offset,
         textcoords='offset points',
-        fontsize=TUFTE_LABEL_SIZE,
+        fontsize=CLEAN_LABEL_SIZE,
         color=color,
         va='center',
         fontfamily='serif',
     )
 
 # Usage: after plotting each series
-ax.plot(x, y1, color=TUFTE_BLACK, linewidth=1.2)
+ax.plot(x, y1, color=CLEAN_BLACK, linewidth=1.2)
 label_line(ax, x, y1, 'Series A')
 
-ax.plot(x, y2, color=TUFTE_MEDIUM_GRAY, linewidth=1.2)
+ax.plot(x, y2, color=CLEAN_MEDIUM_GRAY, linewidth=1.2)
 label_line(ax, x, y2, 'Series B')
 
 # Remove the legend entirely
@@ -177,14 +177,14 @@ def label_lines_no_overlap(ax, series_endpoints, min_gap_pts=12):
             ax.annotate(
                 label, xy=(x_end, y_end), xytext=(8, 0),
                 xycoords='data', textcoords=('offset points', ('data', y_display)),
-                fontsize=TUFTE_LABEL_SIZE, color=color, va='center', fontfamily='serif',
-                arrowprops=dict(arrowstyle='-', color=TUFTE_LIGHT_GRAY, lw=0.6),
+                fontsize=CLEAN_LABEL_SIZE, color=color, va='center', fontfamily='serif',
+                arrowprops=dict(arrowstyle='-', color=CLEAN_LIGHT_GRAY, lw=0.6),
             )
         else:
             ax.annotate(
                 label, xy=(x_end, y_end), xytext=(8, 0),
                 textcoords='offset points',
-                fontsize=TUFTE_LABEL_SIZE, color=color, va='center', fontfamily='serif',
+                fontsize=CLEAN_LABEL_SIZE, color=color, va='center', fontfamily='serif',
             )
 ```
 
@@ -225,12 +225,12 @@ Usage:
 
 ```python
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(x, y1, color=TUFTE_BLACK, linewidth=1.2)
-ax.plot(x, y2, color=TUFTE_MEDIUM_GRAY, linewidth=1.2)
+ax.plot(x, y1, color=CLEAN_BLACK, linewidth=1.2)
+ax.plot(x, y2, color=CLEAN_MEDIUM_GRAY, linewidth=1.2)
 apply_range_frame(ax, x, y1 + y2)  # initial range frame
 pad_axis_for_labels(ax, x, y1 + y2)  # extend for labels
-label_lines_no_overlap(ax, [(x[-1], y1[-1], 'A', TUFTE_BLACK),
-                             (x[-1], y2[-1], 'B', TUFTE_MEDIUM_GRAY)])
+label_lines_no_overlap(ax, [(x[-1], y1[-1], 'A', CLEAN_BLACK),
+                             (x[-1], y2[-1], 'B', CLEAN_MEDIUM_GRAY)])
 ```
 
 ---
@@ -241,14 +241,14 @@ Layer technique: base line, white mask circles, small data dots.
 
 **Important**: This technique works well for single-series plots or at most 2 series.
 For 3+ series, the white mask circles homogenize the dots and series become
-indistinguishable. Use `tufte_multi_line_plot` (below) for multi-series instead.
+indistinguishable. Use `clean_multi_line_plot` (below) for multi-series instead.
 
 ```python
-def tufte_line_plot(ax, x, y, color=TUFTE_BLACK, label=None):
-    """Line plot with Tufte-style dot emphasis at data points.
+def clean_line_plot(ax, x, y, color=CLEAN_BLACK, label=None):
+    """Line plot with dot emphasis at data points.
 
     Use only for single-series or 2-series plots. For 3+ series,
-    use tufte_multi_line_plot which varies line style for differentiation.
+    use clean_multi_line_plot which varies line style for differentiation.
     """
     ax.plot(x, y, linestyle='-', color=color, linewidth=1, zorder=1)
     ax.scatter(x, y, color='white', s=80, zorder=2, edgecolors='none')
@@ -265,21 +265,21 @@ For 2+ series, vary line style alongside color to ensure distinguishability
 without color (important for accessibility, print, and small panels).
 
 ```python
-def tufte_multi_line_plot(ax, x, series_dict, colors=None):
+def clean_multi_line_plot(ax, x, series_dict, colors=None):
     """Multi-series line plot with line style variation and collision-aware labels.
 
     Args:
         ax: matplotlib Axes
         x: shared x-axis data
         series_dict: dict of {label: y_values}
-        colors: optional list of colors (defaults to TUFTE_COLORS)
+        colors: optional list of colors (defaults to CLEAN_COLORS)
     """
-    palette = colors or TUFTE_COLORS
+    palette = colors or CLEAN_COLORS
     endpoints = []
 
     for i, (label, y) in enumerate(series_dict.items()):
         color = palette[i % len(palette)]
-        style = TUFTE_LINE_STYLES[i % len(TUFTE_LINE_STYLES)]
+        style = CLEAN_LINE_STYLES[i % len(CLEAN_LINE_STYLES)]
         ax.plot(x, y, linestyle=style, color=color, linewidth=1.2)
         endpoints.append((x[-1], y[-1], label, color))
 
@@ -289,12 +289,12 @@ def tufte_multi_line_plot(ax, x, series_dict, colors=None):
 
 ---
 
-## Tufte Bar Chart (White Gridlines)
+## Bar Chart (White Gridlines)
 
 Bars with horizontal white lines replacing traditional gridlines:
 
 ```python
-def tufte_bar_chart(ax, categories, values, color=TUFTE_MEDIUM_GRAY):
+def clean_bar_chart(ax, categories, values, color=CLEAN_MEDIUM_GRAY):
     """Bar chart using white gridlines instead of axis spines."""
     bars = ax.bar(categories, values, color=color, edgecolor='none', width=0.6)
 
@@ -311,12 +311,14 @@ def tufte_bar_chart(ax, categories, values, color=TUFTE_MEDIUM_GRAY):
 
     # Direct-label bar values
     for bar, val in zip(bars, values):
+        height = bar.get_height()
+        offset = max(abs(v) for v in values) * 0.02
+        label_y = height + offset if height >= 0 else height - offset
         ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + max(values) * 0.02,
+            bar.get_x() + bar.get_width() / 2, label_y,
             f'{val}',
-            ha='center', va='bottom',
-            fontsize=TUFTE_LABEL_SIZE, fontfamily='serif', color=TUFTE_BLACK,
+            ha='center', va='bottom' if height >= 0 else 'top',
+            fontsize=CLEAN_LABEL_SIZE, fontfamily='serif', color=CLEAN_BLACK,
         )
 
     return bars
@@ -329,11 +331,11 @@ def tufte_bar_chart(ax, categories, values, color=TUFTE_MEDIUM_GRAY):
 For ranked categorical data:
 
 ```python
-def tufte_dot_plot(ax, categories, values, color=TUFTE_BLACK):
-    """Cleveland dot plot — Tufte-preferred alternative to bar charts."""
+def clean_dot_plot(ax, categories, values, color=CLEAN_BLACK):
+    """Cleveland dot plot — Preferred alternative to bar charts."""
     y_pos = range(len(categories))
     ax.scatter(values, y_pos, color=color, s=40, zorder=3)
-    ax.hlines(y_pos, 0, values, color=TUFTE_LIGHT_GRAY, linewidth=0.8, zorder=1)
+    ax.hlines(y_pos, 0, values, color=CLEAN_LIGHT_GRAY, linewidth=0.8, zorder=1)
     ax.set_yticks(y_pos)
     ax.set_yticklabels(categories)
     ax.spines['top'].set_visible(False)
@@ -350,10 +352,10 @@ def tufte_dot_plot(ax, categories, values, color=TUFTE_BLACK):
 For before/after or two-time-point comparisons:
 
 ```python
-def tufte_slope_chart(ax, labels, left_values, right_values,
+def clean_slope_chart(ax, labels, left_values, right_values,
                       left_label='Before', right_label='After',
-                      highlight=None, accent_color=TUFTE_ACCENT):
-    """Tufte-style slope chart for two-point comparisons."""
+                      highlight=None, accent_color=CLEAN_ACCENT):
+    """Slope chart for two-point comparisons."""
     # Resolve overlapping labels
     def resolve_overlaps(values, min_gap=0.5):
         indexed = sorted(enumerate(values), key=lambda x: x[1])
@@ -370,28 +372,28 @@ def tufte_slope_chart(ax, labels, left_values, right_values,
     right_positions = resolve_overlaps(right_values)
 
     for i, label in enumerate(labels):
-        color = accent_color if label == highlight else TUFTE_LIGHT_GRAY
+        color = accent_color if label == highlight else CLEAN_LIGHT_GRAY
         lw = 1.5 if label == highlight else 0.8
         ax.plot([0, 1], [left_positions[i], right_positions[i]],
                 color=color, linewidth=lw)
 
         # Left label
         ax.text(-0.05, left_positions[i], f'{label} ({left_values[i]})',
-                ha='right', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
-                color=TUFTE_BLACK if label == highlight else TUFTE_MEDIUM_GRAY)
+                ha='right', va='center', fontsize=CLEAN_SMALL_SIZE, fontfamily='serif',
+                color=CLEAN_BLACK if label == highlight else CLEAN_MEDIUM_GRAY)
 
         # Right label
         ax.text(1.05, right_positions[i], f'{label} ({right_values[i]})',
-                ha='left', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
-                color=TUFTE_BLACK if label == highlight else TUFTE_MEDIUM_GRAY)
+                ha='left', va='center', fontsize=CLEAN_SMALL_SIZE, fontfamily='serif',
+                color=CLEAN_BLACK if label == highlight else CLEAN_MEDIUM_GRAY)
 
     # Column headers
     ax.text(0, max(left_positions) + 1, left_label,
-            ha='center', va='bottom', fontsize=TUFTE_FONT_SIZE, fontfamily='serif',
-            fontweight='bold', color=TUFTE_BLACK)
+            ha='center', va='bottom', fontsize=CLEAN_FONT_SIZE, fontfamily='serif',
+            fontweight='bold', color=CLEAN_BLACK)
     ax.text(1, max(right_positions) + 1, right_label,
-            ha='center', va='bottom', fontsize=TUFTE_FONT_SIZE, fontfamily='serif',
-            fontweight='bold', color=TUFTE_BLACK)
+            ha='center', va='bottom', fontsize=CLEAN_FONT_SIZE, fontfamily='serif',
+            fontweight='bold', color=CLEAN_BLACK)
 
     # Remove all axes
     ax.axis('off')
@@ -404,8 +406,8 @@ def tufte_slope_chart(ax, labels, left_values, right_values,
 Minimal, word-sized graphic:
 
 ```python
-def tufte_sparkline(ax, data, color=TUFTE_BLACK, highlight_endpoints=True):
-    """Create a Tufte sparkline — a word-sized data graphic."""
+def clean_sparkline(ax, data, color=CLEAN_BLACK, highlight_endpoints=True):
+    """Create a sparkline — a word-sized data graphic."""
     x = range(len(data))
     ax.plot(x, data, color=color, linewidth=0.8)
 
@@ -416,7 +418,7 @@ def tufte_sparkline(ax, data, color=TUFTE_BLACK, highlight_endpoints=True):
         # Mark min and max
         min_idx = np.argmin(data)
         max_idx = np.argmax(data)
-        ax.scatter([min_idx], [data[min_idx]], color=TUFTE_ACCENT, s=8, zorder=3)
+        ax.scatter([min_idx], [data[min_idx]], color=CLEAN_ACCENT, s=8, zorder=3)
         ax.scatter([max_idx], [data[max_idx]], color='#117733', s=8, zorder=3)
 
     # Remove everything except the line
@@ -438,12 +440,12 @@ def sparkline_grid(data_dict, figsize=(10, None)):
         axes = [axes]
 
     for ax, (label, data) in zip(axes, data_dict.items()):
-        tufte_sparkline(ax, data)
+        clean_sparkline(ax, data)
         ax.text(-1, np.mean(data), label, ha='right', va='center',
-                fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=TUFTE_BLACK)
+                fontsize=CLEAN_SMALL_SIZE, fontfamily='serif', color=CLEAN_BLACK)
         ax.text(len(data), data[-1], f' {data[-1]:.1f}',
-                ha='left', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
-                color=TUFTE_BLACK)
+                ha='left', va='center', fontsize=CLEAN_SMALL_SIZE, fontfamily='serif',
+                color=CLEAN_BLACK)
 
     plt.subplots_adjust(hspace=0.5)
     return fig
@@ -454,12 +456,12 @@ def sparkline_grid(data_dict, figsize=(10, None)):
 ## Small Multiples
 
 **Scaling note**: at reduced panel sizes, simplify rather than miniaturize.
-Drop dot emphasis, use a single font size (`TUFTE_SMALL_SIZE`), increase line
+Drop dot emphasis, use a single font size (`CLEAN_SMALL_SIZE`), increase line
 widths to 1.2pt, and avoid per-panel direct labels. See SKILL.md § 7 for the
 full adaptation table.
 
 ```python
-def tufte_small_multiples(data_dict, ncols=3, figsize=(10, 8),
+def clean_small_multiples(data_dict, ncols=3, figsize=(10, 8),
                           plot_fn=None, sharex=True, sharey=True):
     """Create a grid of small multiples with shared axes."""
     n = len(data_dict)
@@ -473,11 +475,11 @@ def tufte_small_multiples(data_dict, ncols=3, figsize=(10, 8),
         if plot_fn:
             plot_fn(ax, x, y)
         else:
-            ax.plot(x, y, color=TUFTE_BLACK, linewidth=1)
-        ax.set_title(title, fontsize=TUFTE_LABEL_SIZE, fontfamily='serif', pad=4)
+            ax.plot(x, y, color=CLEAN_BLACK, linewidth=1)
+        ax.set_title(title, fontsize=CLEAN_LABEL_SIZE, fontfamily='serif', pad=4)
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        ax.tick_params(direction='in', labelsize=TUFTE_SMALL_SIZE)
+        ax.tick_params(direction='in', labelsize=CLEAN_SMALL_SIZE)
 
     # Remove unused panels
     for j in range(n, len(axes_flat)):
@@ -502,24 +504,24 @@ def tufte_small_multiples(data_dict, ncols=3, figsize=(10, 8),
 
 ## Seaborn Overrides
 
-When seaborn is used, override its defaults to match Tufte style:
+When seaborn is used, override its defaults to match clean-viz style:
 
 ```python
 import seaborn as sns
 
-def apply_tufte_seaborn():
-    """Override seaborn defaults with Tufte-style settings."""
+def apply_clean_seaborn():
+    """Override seaborn defaults with clean-viz settings."""
     sns.set_style('white')  # not 'whitegrid' — we control gridlines
     sns.set_context('paper', font_scale=1.1)
-    sns.set_palette([TUFTE_BLACK, TUFTE_MEDIUM_GRAY, TUFTE_ACCENT])
+    sns.set_palette([CLEAN_BLACK, CLEAN_MEDIUM_GRAY, CLEAN_ACCENT])
 
     # After every seaborn plot, call:
     # sns.despine()  — removes top/right spines
     # Then apply range frames manually if needed
 
 # Post-plot cleanup for seaborn:
-def tufte_cleanup_seaborn(ax, x_data=None, y_data=None):
-    """Apply Tufte cleanup after a seaborn plot."""
+def clean_seaborn(ax, x_data=None, y_data=None):
+    """Apply clean-viz cleanup after a seaborn plot."""
     sns.despine(ax=ax)
     ax.tick_params(direction='in')
     if x_data is not None and y_data is not None:
@@ -532,8 +534,8 @@ def tufte_cleanup_seaborn(ax, x_data=None, y_data=None):
 ## Scatter Plot
 
 ```python
-def tufte_scatter(ax, x, y, color=TUFTE_BLACK, label_points=None):
-    """Tufte-style scatter plot with range frames."""
+def clean_scatter(ax, x, y, color=CLEAN_BLACK, label_points=None):
+    """Scatter plot with range frames."""
     ax.scatter(x, y, color=color, s=20, edgecolors='none', alpha=0.8)
     apply_range_frame(ax, x, y)
 
@@ -543,7 +545,7 @@ def tufte_scatter(ax, x, y, color=TUFTE_BLACK, label_points=None):
             ax.annotate(
                 text, (x[idx], y[idx]),
                 xytext=(5, 5), textcoords='offset points',
-                fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=TUFTE_BLACK,
+                fontsize=CLEAN_SMALL_SIZE, fontfamily='serif', color=CLEAN_BLACK,
             )
 ```
 
@@ -552,8 +554,8 @@ def tufte_scatter(ax, x, y, color=TUFTE_BLACK, label_points=None):
 ## Histogram
 
 ```python
-def tufte_histogram(ax, data, bins=20, color=TUFTE_MEDIUM_GRAY):
-    """Tufte-style histogram with white gridlines."""
+def clean_histogram(ax, data, bins=20, color=CLEAN_MEDIUM_GRAY):
+    """Histogram with white gridlines."""
     ax.hist(data, bins=bins, color=color, edgecolor='white', linewidth=0.5)
 
     for spine in ax.spines.values():
@@ -569,22 +571,26 @@ def tufte_histogram(ax, data, bins=20, color=TUFTE_MEDIUM_GRAY):
 ## Heatmap
 
 ```python
-def tufte_heatmap(ax, data, row_labels, col_labels, cmap='Greys'):
-    """Tufte-style heatmap: no gridlines, direct value labels."""
+def clean_heatmap(ax, data, row_labels, col_labels, cmap='Greys'):
+    """Heatmap: no gridlines, direct value labels."""
     im = ax.imshow(data, cmap=cmap, aspect='auto')
 
     ax.set_xticks(range(len(col_labels)))
     ax.set_yticks(range(len(row_labels)))
-    ax.set_xticklabels(col_labels, fontsize=TUFTE_SMALL_SIZE, fontfamily='serif')
-    ax.set_yticklabels(row_labels, fontsize=TUFTE_SMALL_SIZE, fontfamily='serif')
+    ax.set_xticklabels(col_labels, fontsize=CLEAN_SMALL_SIZE, fontfamily='serif')
+    ax.set_yticklabels(row_labels, fontsize=CLEAN_SMALL_SIZE, fontfamily='serif')
 
     # Direct value labels in cells
     for i in range(len(row_labels)):
         for j in range(len(col_labels)):
             val = data[i][j]
-            text_color = 'white' if val > (max(map(max, data)) * 0.6) else TUFTE_BLACK
+            # Pick text color based on cell luminance (works for sequential and diverging colormaps)
+            norm_val = (val - im.norm.vmin) / (im.norm.vmax - im.norm.vmin)
+            r, g, b, _ = im.cmap(norm_val)
+            luminance = 0.299 * r + 0.587 * g + 0.114 * b
+            text_color = 'white' if luminance < 0.5 else CLEAN_BLACK
             ax.text(j, i, f'{val:.1f}', ha='center', va='center',
-                    fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=text_color)
+                    fontsize=CLEAN_SMALL_SIZE, fontfamily='serif', color=text_color)
 
     for spine in ax.spines.values():
         spine.set_visible(False)

@@ -1,16 +1,17 @@
 {
-  "name": "tufte-viz-skill",
+  "name": "clean-viz-skill",
   "owner": {
     "name": "maksymsherman"
   },
   "plugins": [
     {
-      "name": "tufte-viz",
+      "name": "clean-viz",
       "source": "./",
-      "description": "Enforces Edward Tufte's data visualization principles for publication-quality, chartjunk-free graphics",
+      "description": "Applies data visualization best practices inspired by Edward Tufte's principles for publication-quality, chartjunk-free graphics",
       "version": "1.0.0",
       "license": "MIT",
       "keywords": [
+        "clean-viz",
         "tufte",
         "data-visualization",
         "matplotlib",

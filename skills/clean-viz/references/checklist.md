@@ -26,8 +26,8 @@ Run through every item after generating visualization code. Each item is pass/fa
 - [ ] Font family is serif (Georgia, Palatino, Times New Roman, or generic serif)
 - [ ] Title is sentence case (not ALL CAPS, not Title Case)
 - [ ] Font sizes are consistent and readable (10-14pt range)
-- [ ] **Font size consistency**: all manually-placed text (`ax.text`, `ax.annotate`, `add_annotation`) references the global typography constants (`TUFTE_LABEL_SIZE`, `TUFTE_SMALL_SIZE`) — no bare numeric `fontsize` values
-- [ ] **Label color consistency**: all label text uses `TUFTE_BLACK` unless intentionally de-emphasized — no bare `color='gray'` or `color='#888888'` except for explicitly muted elements
+- [ ] **Font size consistency**: all manually-placed text (`ax.text`, `ax.annotate`, `add_annotation`) references the global typography constants (`CLEAN_LABEL_SIZE`, `CLEAN_SMALL_SIZE`) — no bare numeric `fontsize` values
+- [ ] **Label color consistency**: all label text uses `CLEAN_BLACK` unless intentionally de-emphasized — no bare `color='gray'` or `color='#888888'` except for explicitly muted elements
 - [ ] No bold text except where emphasis is essential
 
 ## Labels and Legends

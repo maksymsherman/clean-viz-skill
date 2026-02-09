@@ -1,12 +1,13 @@
 {
-  "name": "tufte-viz",
+  "name": "clean-viz",
   "version": "1.0.0",
-  "description": "Enforces Edward Tufte's data visualization principles for publication-quality, chartjunk-free graphics",
+  "description": "Applies data visualization best practices inspired by Edward Tufte's principles for publication-quality, chartjunk-free graphics",
   "author": {
     "name": "maksymsherman"
   },
   "license": "MIT",
   "keywords": [
+    "clean-viz",
     "tufte",
     "data-visualization",
     "matplotlib",

@@ -1,6 +1,6 @@
-# Plotly — Tufte Patterns
+# Plotly — Clean-Viz Patterns
 
-Concrete code patterns for producing Tufte-style visualizations in Plotly. Copy and adapt these patterns when generating visualization code.
+Concrete code patterns for producing clean, publication-quality visualizations in Plotly (inspired by Edward Tufte's principles). Copy and adapt these patterns when generating visualization code.
 
 ---
 
@@ -12,7 +12,7 @@ Apply this layout to every Plotly figure:
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-TUFTE_LAYOUT = dict(
+CLEAN_LAYOUT = dict(
     font=dict(family='Georgia, serif', size=12, color='#333333'),
     paper_bgcolor='white',
     plot_bgcolor='white',
@@ -46,16 +46,16 @@ TUFTE_LAYOUT = dict(
 )
 
 # Color constants
-TUFTE_BLACK = '#333333'
-TUFTE_MEDIUM_GRAY = '#888888'
-TUFTE_LIGHT_GRAY = '#cccccc'
-TUFTE_ACCENT = '#c0392b'
+CLEAN_BLACK = '#333333'
+CLEAN_MEDIUM_GRAY = '#888888'
+CLEAN_LIGHT_GRAY = '#cccccc'
+CLEAN_ACCENT = '#c0392b'
 ```
 
 Usage:
 
 ```python
-fig = go.Figure(layout=TUFTE_LAYOUT)
+fig = go.Figure(layout=CLEAN_LAYOUT)
 fig.update_layout(title_text='Descriptive sentence-case title')
 ```
 
@@ -76,13 +76,13 @@ def apply_plotly_range_frame(fig, x_data, y_data):
     fig.update_xaxes(
         range=[x_min - x_pad, x_max + x_pad],
         showline=True,
-        linecolor=TUFTE_BLACK,
+        linecolor=CLEAN_BLACK,
         linewidth=1,
     )
     fig.update_yaxes(
         range=[y_min - y_pad, y_max + y_pad],
         showline=True,
-        linecolor=TUFTE_BLACK,
+        linecolor=CLEAN_BLACK,
         linewidth=1,
     )
     return fig
@@ -93,9 +93,9 @@ def apply_plotly_range_frame(fig, x_data, y_data):
 ## Line Chart
 
 ```python
-def tufte_line_chart(x, y, name='', color=TUFTE_BLACK):
-    """Create a Tufte-style Plotly line chart."""
-    fig = go.Figure(layout=TUFTE_LAYOUT)
+def clean_line_chart(x, y, name='', color=CLEAN_BLACK):
+    """Create a clean Plotly line chart."""
+    fig = go.Figure(layout=CLEAN_LAYOUT)
 
     # Base line
     fig.add_trace(go.Scatter(
@@ -128,7 +128,7 @@ def tufte_line_chart(x, y, name='', color=TUFTE_BLACK):
 ## Direct Annotations (Replace Legends)
 
 ```python
-def add_series_label(fig, x_end, y_end, label, color=TUFTE_BLACK):
+def add_series_label(fig, x_end, y_end, label, color=CLEAN_BLACK):
     """Add a direct label at the end of a data series."""
     fig.add_annotation(
         x=x_end, y=y_end,
@@ -139,7 +139,7 @@ def add_series_label(fig, x_end, y_end, label, color=TUFTE_BLACK):
         font=dict(family='Georgia, serif', size=11, color=color),
     )
 
-def add_point_annotation(fig, x, y, text, color=TUFTE_BLACK):
+def add_point_annotation(fig, x, y, text, color=CLEAN_BLACK):
     """Annotate a specific data point (max, min, notable value)."""
     fig.add_annotation(
         x=x, y=y,
@@ -147,7 +147,7 @@ def add_point_annotation(fig, x, y, text, color=TUFTE_BLACK):
         showarrow=True,
         arrowhead=0,
         arrowwidth=0.8,
-        arrowcolor=TUFTE_MEDIUM_GRAY,
+        arrowcolor=CLEAN_MEDIUM_GRAY,
         ax=0, ay=-25,
         font=dict(family='Georgia, serif', size=10, color=color),
     )
@@ -158,9 +158,9 @@ def add_point_annotation(fig, x, y, text, color=TUFTE_BLACK):
 ## Bar Chart (White Gridlines)
 
 ```python
-def tufte_bar_chart(categories, values, color=TUFTE_MEDIUM_GRAY):
-    """Tufte-style bar chart with white gridlines."""
-    fig = go.Figure(layout=TUFTE_LAYOUT)
+def clean_bar_chart(categories, values, color=CLEAN_MEDIUM_GRAY):
+    """Bar chart with white gridlines."""
+    fig = go.Figure(layout=CLEAN_LAYOUT)
 
     fig.add_trace(go.Bar(
         x=categories, y=values,
@@ -168,7 +168,7 @@ def tufte_bar_chart(categories, values, color=TUFTE_MEDIUM_GRAY):
         marker_line_width=0,
         text=[str(v) for v in values],
         textposition='outside',
-        textfont=dict(family='Georgia, serif', size=10, color=TUFTE_BLACK),
+        textfont=dict(family='Georgia, serif', size=10, color=CLEAN_BLACK),
     ))
 
     # White gridlines over bars
@@ -190,9 +190,9 @@ def tufte_bar_chart(categories, values, color=TUFTE_MEDIUM_GRAY):
 ## Scatter Plot
 
 ```python
-def tufte_scatter(x, y, labels=None, color=TUFTE_BLACK):
-    """Tufte-style scatter with range frames and optional point labels."""
-    fig = go.Figure(layout=TUFTE_LAYOUT)
+def clean_scatter(x, y, labels=None, color=CLEAN_BLACK):
+    """Scatter with range frames and optional point labels."""
+    fig = go.Figure(layout=CLEAN_LAYOUT)
 
     fig.add_trace(go.Scatter(
         x=x, y=y, mode='markers',
@@ -208,7 +208,7 @@ def tufte_scatter(x, y, labels=None, color=TUFTE_BLACK):
             fig.add_annotation(
                 x=xi, y=yi, text=label,
                 showarrow=False, xshift=8, yshift=5,
-                font=dict(family='Georgia, serif', size=9, color=TUFTE_BLACK),
+                font=dict(family='Georgia, serif', size=9, color=CLEAN_BLACK),
             )
 
     return fig
@@ -219,7 +219,7 @@ def tufte_scatter(x, y, labels=None, color=TUFTE_BLACK):
 ## Small Multiples
 
 ```python
-def tufte_small_multiples(data_dict, ncols=3, chart_type='line'):
+def clean_small_multiples(data_dict, ncols=3, chart_type='line'):
     """Create a grid of small multiples with shared axes."""
     n = len(data_dict)
     nrows = -(-n // ncols)  # ceiling division
@@ -240,22 +240,22 @@ def tufte_small_multiples(data_dict, ncols=3, chart_type='line'):
         if chart_type == 'line':
             fig.add_trace(
                 go.Scatter(x=x, y=y, mode='lines',
-                           line=dict(color=TUFTE_BLACK, width=1.2),
+                           line=dict(color=CLEAN_BLACK, width=1.2),
                            showlegend=False),
                 row=row, col=col,
             )
         elif chart_type == 'bar':
             fig.add_trace(
-                go.Bar(x=x, y=y, marker_color=TUFTE_MEDIUM_GRAY,
+                go.Bar(x=x, y=y, marker_color=CLEAN_MEDIUM_GRAY,
                        showlegend=False),
                 row=row, col=col,
             )
 
-    # Apply Tufte styling to all axes
+    # Apply clean-viz styling to all axes
     fig.update_xaxes(showgrid=False, ticks='inside', showline=True,
-                     linecolor=TUFTE_BLACK, linewidth=1, zeroline=False)
+                     linecolor=CLEAN_BLACK, linewidth=1, zeroline=False)
     fig.update_yaxes(showgrid=False, ticks='inside', showline=True,
-                     linecolor=TUFTE_BLACK, linewidth=1, zeroline=False)
+                     linecolor=CLEAN_BLACK, linewidth=1, zeroline=False)
 
     fig.update_layout(
         font=dict(family='Georgia, serif', size=10),
@@ -267,7 +267,7 @@ def tufte_small_multiples(data_dict, ncols=3, chart_type='line'):
 
     # Style subplot titles
     for annotation in fig['layout']['annotations']:
-        annotation['font'] = dict(family='Georgia, serif', size=11, color=TUFTE_BLACK)
+        annotation['font'] = dict(family='Georgia, serif', size=11, color=CLEAN_BLACK)
 
     return fig
 ```
@@ -277,14 +277,14 @@ def tufte_small_multiples(data_dict, ncols=3, chart_type='line'):
 ## Sparkline
 
 ```python
-def tufte_sparkline(data, width=200, height=30):
+def clean_sparkline(data, width=200, height=30):
     """Create a minimal sparkline figure."""
     x = list(range(len(data)))
-    fig = go.Figure(layout=TUFTE_LAYOUT)
+    fig = go.Figure(layout=CLEAN_LAYOUT)
 
     fig.add_trace(go.Scatter(
         x=x, y=data, mode='lines',
-        line=dict(color=TUFTE_BLACK, width=1),
+        line=dict(color=CLEAN_BLACK, width=1),
         showlegend=False,
     ))
 
@@ -296,7 +296,7 @@ def tufte_sparkline(data, width=200, height=30):
         y=[data[0], data[-1], data[min_idx], data[max_idx]],
         mode='markers',
         marker=dict(
-            color=[TUFTE_BLACK, TUFTE_BLACK, TUFTE_ACCENT, '#117733'],
+            color=[CLEAN_BLACK, CLEAN_BLACK, CLEAN_ACCENT, '#117733'],
             size=4,
         ),
         showlegend=False,
@@ -317,9 +317,9 @@ def tufte_sparkline(data, width=200, height=30):
 ## Heatmap
 
 ```python
-def tufte_heatmap(z, x_labels, y_labels, colorscale='Greys'):
-    """Tufte-style heatmap with direct cell labels."""
-    fig = go.Figure(layout=TUFTE_LAYOUT)
+def clean_heatmap(z, x_labels, y_labels, colorscale='Greys'):
+    """Heatmap with direct cell labels."""
+    fig = go.Figure(layout=CLEAN_LAYOUT)
 
     fig.add_trace(go.Heatmap(
         z=z, x=x_labels, y=y_labels,
@@ -330,8 +330,9 @@ def tufte_heatmap(z, x_labels, y_labels, colorscale='Greys'):
     # Direct value annotations in cells
     for i, row in enumerate(z):
         for j, val in enumerate(row):
-            max_val = max(max(r) for r in z)
-            text_color = 'white' if val > max_val * 0.6 else TUFTE_BLACK
+            # Use absolute value so both extremes of diverging colormaps get white text
+            abs_max = max(abs(v) for row in z for v in row)
+            text_color = 'white' if abs(val) > abs_max * 0.6 else CLEAN_BLACK
             fig.add_annotation(
                 x=x_labels[j], y=y_labels[i],
                 text=f'{val:.1f}',
@@ -352,18 +353,18 @@ def tufte_heatmap(z, x_labels, y_labels, colorscale='Greys'):
 When comparing multiple series, use direct labels instead of a legend:
 
 ```python
-TUFTE_LINE_DASHES = ['solid', 'dash', 'dashdot', 'dot']
+CLEAN_LINE_DASHES = ['solid', 'dash', 'dashdot', 'dot']
 
-def tufte_multi_line(x, y_dict, colors=None):
+def clean_multi_line(x, y_dict, colors=None):
     """Multiple line series with direct labels, line style variation, and collision-aware labeling."""
-    fig = go.Figure(layout=TUFTE_LAYOUT)
-    palette = colors or [TUFTE_BLACK, TUFTE_MEDIUM_GRAY, TUFTE_ACCENT, TUFTE_LIGHT_GRAY]
+    fig = go.Figure(layout=CLEAN_LAYOUT)
+    palette = colors or [CLEAN_BLACK, CLEAN_MEDIUM_GRAY, CLEAN_ACCENT, CLEAN_LIGHT_GRAY]
 
     all_y = []
     endpoints = []  # collect for collision-aware labeling
     for i, (name, y) in enumerate(y_dict.items()):
         color = palette[i % len(palette)]
-        dash = TUFTE_LINE_DASHES[i % len(TUFTE_LINE_DASHES)]
+        dash = CLEAN_LINE_DASHES[i % len(CLEAN_LINE_DASHES)]
         fig.add_trace(go.Scatter(
             x=x, y=y, mode='lines',
             line=dict(color=color, width=1.5, dash=dash),
@@ -391,7 +392,7 @@ def tufte_multi_line(x, y_dict, colors=None):
         fig.add_annotation(
             x=x_end, y=pos, text=name,
             showarrow=pos != y_end,  # leader line if displaced
-            arrowhead=0, arrowwidth=0.6, arrowcolor=TUFTE_LIGHT_GRAY,
+            arrowhead=0, arrowwidth=0.6, arrowcolor=CLEAN_LIGHT_GRAY,
             ax=0, ay=(y_end - pos) * 0.5 if pos != y_end else 0,
             xanchor='left', xshift=8,
             font=dict(family='Georgia, serif', size=11, color=color),
