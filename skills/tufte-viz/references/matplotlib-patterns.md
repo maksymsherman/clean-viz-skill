@@ -52,6 +52,18 @@ TUFTE_LIGHT_GRAY = '#cccccc'
 TUFTE_FAINT_GRAY = '#eeeeee'
 TUFTE_ACCENT = '#c0392b'  # muted red, for emphasis only
 
+# Typography constants — always reference these instead of hardcoding sizes.
+# These must stay in sync with the rcParams values above.
+TUFTE_FONT_SIZE = 11       # base text and axis labels (matches rcParams font.size)
+TUFTE_TITLE_SIZE = 13      # chart titles (matches rcParams axes.titlesize)
+TUFTE_LABEL_SIZE = 10      # direct labels and annotations
+TUFTE_SMALL_SIZE = 9       # secondary labels, de-emphasized text, small multiples
+
+# Line style cycle — use alongside color to distinguish multi-series lines.
+# Ensures series are distinguishable without color (accessibility, small sizes, print).
+TUFTE_LINE_STYLES = ['solid', 'dashed', (0, (4, 2, 1, 2)), 'dotted']
+#                    solid    dashed    dash-dot                dotted
+
 # Colorblind-safe palette (Paul Tol) — use when multiple colors required
 TUFTE_COLORS = [
     '#332288',  # indigo
@@ -106,7 +118,7 @@ def label_line(ax, x, y, label, color=TUFTE_BLACK, offset=(5, 0)):
         xy=(x[-1], y[-1]),
         xytext=offset,
         textcoords='offset points',
-        fontsize=10,
+        fontsize=TUFTE_LABEL_SIZE,
         color=color,
         va='center',
         fontfamily='serif',
@@ -124,20 +136,155 @@ ax.legend().set_visible(False)
 # Or better: never call ax.legend() at all
 ```
 
+### Collision-Aware Multi-Series Labeling
+
+**Warning**: simple endpoint labeling (above) will collide whenever two or more series
+have similar final values. For multi-series plots, always use `label_lines_no_overlap`
+instead of calling `label_line` in a loop.
+
+```python
+def label_lines_no_overlap(ax, series_endpoints, min_gap_pts=12):
+    """Place end-of-line labels with vertical collision avoidance.
+
+    Args:
+        ax: matplotlib Axes
+        series_endpoints: list of (x_end, y_end, label, color) tuples
+        min_gap_pts: minimum vertical gap between labels in points
+    """
+    # Sort by y-value so we can stack from bottom to top
+    sorted_items = sorted(series_endpoints, key=lambda s: s[1])
+
+    # Convert min_gap from points to data coordinates
+    fig = ax.get_figure()
+    fig.canvas.draw()
+    inv = ax.transData.inverted()
+    _, y0 = inv.transform((0, 0))
+    _, y1 = inv.transform((0, min_gap_pts))
+    gap_data = abs(y1 - y0)
+
+    # Assign display positions, pushing overlapping labels upward
+    display_positions = []
+    for i, (x_end, y_end, label, color) in enumerate(sorted_items):
+        pos = y_end
+        if i > 0 and pos - display_positions[i - 1] < gap_data:
+            pos = display_positions[i - 1] + gap_data
+        display_positions.append(pos)
+
+    # Draw labels; add a leader line if label was displaced
+    for (x_end, y_end, label, color), y_display in zip(sorted_items, display_positions):
+        displaced = abs(y_display - y_end) > gap_data * 0.1
+        if displaced:
+            ax.annotate(
+                label, xy=(x_end, y_end), xytext=(8, 0),
+                xycoords='data', textcoords=('offset points', ('data', y_display)),
+                fontsize=TUFTE_LABEL_SIZE, color=color, va='center', fontfamily='serif',
+                arrowprops=dict(arrowstyle='-', color=TUFTE_LIGHT_GRAY, lw=0.6),
+            )
+        else:
+            ax.annotate(
+                label, xy=(x_end, y_end), xytext=(8, 0),
+                textcoords='offset points',
+                fontsize=TUFTE_LABEL_SIZE, color=color, va='center', fontfamily='serif',
+            )
+```
+
 ---
 
-## Line Plot with Dot Emphasis
+## Axis Padding for End-of-Line Labels
+
+Direct labels at line endpoints require extending `xlim` beyond the data to make room
+for text. But this causes matplotlib to auto-generate tick marks in the padding zone,
+and the spine visually extends into non-data territory — undermining the range frame
+principle.
+
+**Always apply this pattern after extending xlim for label room:**
+
+```python
+def pad_axis_for_labels(ax, x_data, y_data, pad_fraction=0.12):
+    """Extend xlim for label room while keeping ticks and spines within data range.
+
+    Call this AFTER plotting and BEFORE label_line / label_lines_no_overlap.
+    """
+    x_min, x_max = min(x_data), max(x_data)
+    x_range = x_max - x_min
+
+    # Extend xlim to make room for labels on the right
+    ax.set_xlim(x_min - x_range * 0.02, x_max + x_range * pad_fraction)
+
+    # Constrain ticks to data range only (no ticks in padding zone)
+    existing_ticks = [t for t in ax.get_xticks() if x_min <= t <= x_max]
+    ax.set_xticks(existing_ticks)
+
+    # Re-assert range frame bounds after xlim change
+    ax.spines['bottom'].set_bounds(x_min, x_max)
+    if y_data is not None:
+        ax.spines['left'].set_bounds(min(y_data), max(y_data))
+```
+
+Usage:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(x, y1, color=TUFTE_BLACK, linewidth=1.2)
+ax.plot(x, y2, color=TUFTE_MEDIUM_GRAY, linewidth=1.2)
+apply_range_frame(ax, x, y1 + y2)  # initial range frame
+pad_axis_for_labels(ax, x, y1 + y2)  # extend for labels
+label_lines_no_overlap(ax, [(x[-1], y1[-1], 'A', TUFTE_BLACK),
+                             (x[-1], y2[-1], 'B', TUFTE_MEDIUM_GRAY)])
+```
+
+---
+
+## Line Plot with Dot Emphasis (Single Series Only)
 
 Layer technique: base line, white mask circles, small data dots.
 
+**Important**: This technique works well for single-series plots or at most 2 series.
+For 3+ series, the white mask circles homogenize the dots and series become
+indistinguishable. Use `tufte_multi_line_plot` (below) for multi-series instead.
+
 ```python
 def tufte_line_plot(ax, x, y, color=TUFTE_BLACK, label=None):
-    """Line plot with Tufte-style dot emphasis at data points."""
+    """Line plot with Tufte-style dot emphasis at data points.
+
+    Use only for single-series or 2-series plots. For 3+ series,
+    use tufte_multi_line_plot which varies line style for differentiation.
+    """
     ax.plot(x, y, linestyle='-', color=color, linewidth=1, zorder=1)
     ax.scatter(x, y, color='white', s=80, zorder=2, edgecolors='none')
     ax.scatter(x, y, color=color, s=15, zorder=3, edgecolors='none')
     if label:
         label_line(ax, x, y, label, color=color)
+```
+
+---
+
+## Multi-Series Line Plot
+
+For 2+ series, vary line style alongside color to ensure distinguishability
+without color (important for accessibility, print, and small panels).
+
+```python
+def tufte_multi_line_plot(ax, x, series_dict, colors=None):
+    """Multi-series line plot with line style variation and collision-aware labels.
+
+    Args:
+        ax: matplotlib Axes
+        x: shared x-axis data
+        series_dict: dict of {label: y_values}
+        colors: optional list of colors (defaults to TUFTE_COLORS)
+    """
+    palette = colors or TUFTE_COLORS
+    endpoints = []
+
+    for i, (label, y) in enumerate(series_dict.items()):
+        color = palette[i % len(palette)]
+        style = TUFTE_LINE_STYLES[i % len(TUFTE_LINE_STYLES)]
+        ax.plot(x, y, linestyle=style, color=color, linewidth=1.2)
+        endpoints.append((x[-1], y[-1], label, color))
+
+    # Collision-aware labeling (see label_lines_no_overlap)
+    label_lines_no_overlap(ax, endpoints)
 ```
 
 ---
@@ -169,7 +316,7 @@ def tufte_bar_chart(ax, categories, values, color=TUFTE_MEDIUM_GRAY):
             bar.get_height() + max(values) * 0.02,
             f'{val}',
             ha='center', va='bottom',
-            fontsize=10, fontfamily='serif', color=TUFTE_BLACK,
+            fontsize=TUFTE_LABEL_SIZE, fontfamily='serif', color=TUFTE_BLACK,
         )
 
     return bars
@@ -230,20 +377,20 @@ def tufte_slope_chart(ax, labels, left_values, right_values,
 
         # Left label
         ax.text(-0.05, left_positions[i], f'{label} ({left_values[i]})',
-                ha='right', va='center', fontsize=9, fontfamily='serif',
+                ha='right', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
                 color=TUFTE_BLACK if label == highlight else TUFTE_MEDIUM_GRAY)
 
         # Right label
         ax.text(1.05, right_positions[i], f'{label} ({right_values[i]})',
-                ha='left', va='center', fontsize=9, fontfamily='serif',
+                ha='left', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
                 color=TUFTE_BLACK if label == highlight else TUFTE_MEDIUM_GRAY)
 
     # Column headers
     ax.text(0, max(left_positions) + 1, left_label,
-            ha='center', va='bottom', fontsize=11, fontfamily='serif',
+            ha='center', va='bottom', fontsize=TUFTE_FONT_SIZE, fontfamily='serif',
             fontweight='bold', color=TUFTE_BLACK)
     ax.text(1, max(right_positions) + 1, right_label,
-            ha='center', va='bottom', fontsize=11, fontfamily='serif',
+            ha='center', va='bottom', fontsize=TUFTE_FONT_SIZE, fontfamily='serif',
             fontweight='bold', color=TUFTE_BLACK)
 
     # Remove all axes
@@ -293,9 +440,9 @@ def sparkline_grid(data_dict, figsize=(10, None)):
     for ax, (label, data) in zip(axes, data_dict.items()):
         tufte_sparkline(ax, data)
         ax.text(-1, np.mean(data), label, ha='right', va='center',
-                fontsize=9, fontfamily='serif', color=TUFTE_BLACK)
+                fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=TUFTE_BLACK)
         ax.text(len(data), data[-1], f' {data[-1]:.1f}',
-                ha='left', va='center', fontsize=9, fontfamily='serif',
+                ha='left', va='center', fontsize=TUFTE_SMALL_SIZE, fontfamily='serif',
                 color=TUFTE_BLACK)
 
     plt.subplots_adjust(hspace=0.5)
@@ -305,6 +452,11 @@ def sparkline_grid(data_dict, figsize=(10, None)):
 ---
 
 ## Small Multiples
+
+**Scaling note**: at reduced panel sizes, simplify rather than miniaturize.
+Drop dot emphasis, use a single font size (`TUFTE_SMALL_SIZE`), increase line
+widths to 1.2pt, and avoid per-panel direct labels. See SKILL.md § 7 for the
+full adaptation table.
 
 ```python
 def tufte_small_multiples(data_dict, ncols=3, figsize=(10, 8),
@@ -322,10 +474,10 @@ def tufte_small_multiples(data_dict, ncols=3, figsize=(10, 8),
             plot_fn(ax, x, y)
         else:
             ax.plot(x, y, color=TUFTE_BLACK, linewidth=1)
-        ax.set_title(title, fontsize=10, fontfamily='serif', pad=4)
+        ax.set_title(title, fontsize=TUFTE_LABEL_SIZE, fontfamily='serif', pad=4)
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        ax.tick_params(direction='in', labelsize=8)
+        ax.tick_params(direction='in', labelsize=TUFTE_SMALL_SIZE)
 
     # Remove unused panels
     for j in range(n, len(axes_flat)):
@@ -391,7 +543,7 @@ def tufte_scatter(ax, x, y, color=TUFTE_BLACK, label_points=None):
             ax.annotate(
                 text, (x[idx], y[idx]),
                 xytext=(5, 5), textcoords='offset points',
-                fontsize=9, fontfamily='serif', color=TUFTE_BLACK,
+                fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=TUFTE_BLACK,
             )
 ```
 
@@ -423,8 +575,8 @@ def tufte_heatmap(ax, data, row_labels, col_labels, cmap='Greys'):
 
     ax.set_xticks(range(len(col_labels)))
     ax.set_yticks(range(len(row_labels)))
-    ax.set_xticklabels(col_labels, fontsize=9, fontfamily='serif')
-    ax.set_yticklabels(row_labels, fontsize=9, fontfamily='serif')
+    ax.set_xticklabels(col_labels, fontsize=TUFTE_SMALL_SIZE, fontfamily='serif')
+    ax.set_yticklabels(row_labels, fontsize=TUFTE_SMALL_SIZE, fontfamily='serif')
 
     # Direct value labels in cells
     for i in range(len(row_labels)):
@@ -432,7 +584,7 @@ def tufte_heatmap(ax, data, row_labels, col_labels, cmap='Greys'):
             val = data[i][j]
             text_color = 'white' if val > (max(map(max, data)) * 0.6) else TUFTE_BLACK
             ax.text(j, i, f'{val:.1f}', ha='center', va='center',
-                    fontsize=9, fontfamily='serif', color=text_color)
+                    fontsize=TUFTE_SMALL_SIZE, fontfamily='serif', color=text_color)
 
     for spine in ax.spines.values():
         spine.set_visible(False)

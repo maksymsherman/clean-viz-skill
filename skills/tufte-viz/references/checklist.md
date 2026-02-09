@@ -19,12 +19,15 @@ Run through every item after generating visualization code. Each item is pass/fa
 - [ ] Tick marks face inward
 - [ ] Tick density is reduced from library defaults
 - [ ] No tick label rotation (if labels are long, use horizontal bar chart)
+- [ ] **No tick/spine overshoot**: after any `set_xlim`/`set_ylim` override (e.g., for label padding), verify that tick marks and spine bounds do not extend beyond the data range
 
 ## Typography
 
 - [ ] Font family is serif (Georgia, Palatino, Times New Roman, or generic serif)
 - [ ] Title is sentence case (not ALL CAPS, not Title Case)
 - [ ] Font sizes are consistent and readable (10-14pt range)
+- [ ] **Font size consistency**: all manually-placed text (`ax.text`, `ax.annotate`, `add_annotation`) references the global typography constants (`TUFTE_LABEL_SIZE`, `TUFTE_SMALL_SIZE`) — no bare numeric `fontsize` values
+- [ ] **Label color consistency**: all label text uses `TUFTE_BLACK` unless intentionally de-emphasized — no bare `color='gray'` or `color='#888888'` except for explicitly muted elements
 - [ ] No bold text except where emphasis is essential
 
 ## Labels and Legends
@@ -32,7 +35,10 @@ Run through every item after generating visualization code. Each item is pass/fa
 - [ ] Legend box removed; series are directly labeled on the plot
 - [ ] Key data points are annotated (max, min, notable values)
 - [ ] Redundant axis labels removed where title or context provides meaning
-- [ ] No text overlaps with other text or data
+- [ ] **No label-to-label collisions**: check that every direct label has clear space from all other direct labels — especially when series have similar endpoint values
+- [ ] **No label-to-data collisions**: check that labels do not overlap with nearby data points, lines, or markers
+- [ ] If labels were displaced to avoid collisions, leader lines or offsets make the association clear
+- [ ] **Multi-series distinguishability**: series can be told apart without color — verify line style variation (solid/dashed/dash-dot/dotted) or marker shape variation is present. This is essential for accessibility, print, and small panels
 
 ## Color
 
@@ -80,3 +86,20 @@ Run through every item after generating visualization code. Each item is pass/fa
 - [ ] Overall patterns and trends are visible at a glance
 - [ ] Sparklines are word-sized when used inline
 - [ ] Small multiples share axes for valid comparison
+
+## Multi-Chart Cohesion (when generating 2+ charts in a session)
+
+- [ ] Same color palette and color-to-meaning assignments across all charts
+- [ ] Same font family, base font size, title size, and label size
+- [ ] Same axis styling (spine treatment, tick direction, range frames)
+- [ ] Same or compatible figure dimensions / aspect ratios
+- [ ] Same line widths, marker sizes, and bar widths
+- [ ] Categories that appear in multiple charts use the same sort order
+
+## Small-Panel Scaling (for small multiples and multi-panel layouts)
+
+- [ ] Line widths are thick enough to be visible at panel size
+- [ ] Font sizes are readable at panel size (not below 8pt rendered)
+- [ ] Dot emphasis is not used for 3+ series at small panel sizes
+- [ ] Per-panel annotations are omitted or limited to a single highlighted panel
+- [ ] Reference lines are visible or omitted entirely (not invisibly thin)

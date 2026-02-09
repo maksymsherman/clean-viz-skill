@@ -78,8 +78,24 @@ Apply ALL of the following to every visualization:
 
 ### Labeling
 - **Direct labeling over legends** — place text labels next to data series; remove the legend box entirely when possible
+- **Handle label collisions** — centroid-based placement (e.g., placing labels at the endpoint of each line) will collide whenever groups have similar values. When multiple labels cluster together:
+  - Use vertical offset stacking: sort labels by y-value and enforce a minimum gap
+  - Prefer edge-of-cluster placement (e.g., percentile-based anchors) over centroids
+  - As a last resort, use short leader lines connecting displaced labels to their data points
+  - Always visually verify that no label overlaps another label or obscures data points
+- **Pad axes for end-of-line labels without breaking range frames** — extending `xlim` for label room creates ticks and spines in non-data territory. After any `set_xlim` override: (1) reset `set_xticks` to data-range-only values, (2) re-assert `spines['bottom'].set_bounds(data_min, data_max)`. See the `pad_axis_for_labels` helper in the matplotlib patterns.
 - **Annotate key data points** — label maximums, minimums, inflection points, or notable values directly on the plot
 - **Remove redundant axis labels** — if the title or context makes the axis meaning obvious, omit the label
+
+### Consistency in Generated Code
+- **Never hardcode font sizes or colors in helper functions** — always reference the defined global constants (e.g., `TUFTE_LABEL_SIZE`, `TUFTE_BLACK`)
+- **Default all label text to `TUFTE_BLACK`** — reserve gray only for intentionally de-emphasized elements (e.g., non-highlighted series in a slope chart)
+- **In multi-panel figures**, inconsistent font sizes and label colors are hard to catch visually — using constants prevents this class of bug entirely
+
+### Multi-Series Differentiation
+- **Use line style variation alongside color** — solid, dashed, dash-dot, dotted. At small sizes or in print, color alone is insufficient to distinguish series
+- **Dot emphasis degrades for multi-series** — the white-mask-plus-colored-dot technique works for single-series plots but homogenizes multi-series lines since all dots look the same regardless of color. For multi-series, vary line style instead and reserve dot emphasis for single-series or ≤2 series
+- **When using markers for multi-series**, vary marker shape (circle, square, triangle, diamond) in addition to color
 
 ### Color
 - **Default to grayscale** — use black, dark gray (`#333333`), medium gray (`#888888`), light gray (`#cccccc`)
@@ -136,21 +152,26 @@ When generating code, load the appropriate reference file for concrete code patt
 ### Python — matplotlib / seaborn
 Read `references/matplotlib-patterns.md` for:
 - Base `rcParams` configuration
+- Color palette and typography constants (`TUFTE_FONT_SIZE`, `TUFTE_LABEL_SIZE`, etc.)
+- Line style cycle (`TUFTE_LINE_STYLES`) for multi-series differentiation
 - `apply_range_frame()` helper function
-- Direct labeling patterns
+- `pad_axis_for_labels()` — extend xlim without breaking range frames
+- `label_lines_no_overlap()` — collision-aware multi-series labeling
+- `tufte_multi_line_plot()` — multi-series with line style variation
+- Direct labeling patterns (single-series)
 - Tufte bar chart (white gridlines)
-- Line plot with dot emphasis
+- Line plot with dot emphasis (single-series only)
 - Slope chart implementation
 - Sparkline function
-- Small multiples template
+- Small multiples template (with scaling notes)
 - Seaborn overrides
-- Color palette definitions
 
 ### Python — Plotly
 Read `references/plotly-patterns.md` for:
 - `TUFTE_LAYOUT` base template
 - Range frame axis configuration
 - Direct annotation patterns
+- Multi-series line chart with line style variation and collision-aware labels
 - Small multiples with `make_subplots`
 - Sparkline configuration
 
@@ -203,9 +224,39 @@ When comparing data across categories, time periods, or groups:
 - **No more than ~25 panels** — beyond this, consider aggregation
 - **Order meaningfully** — alphabetical, chronological, or by a key metric (not random)
 
+### Small-Panel Adaptations
+
+The patterns in this skill are written for single full-size charts. At reduced panel sizes, many techniques degrade silently. When panels shrink, adapt:
+
+| Full-size technique | Problem at small size | Small-panel substitute |
+|---|---|---|
+| Fine reference lines (0.5-0.8pt) | Become invisible | Increase to 1-1.2pt or omit entirely |
+| Dot emphasis (white mask + dot) | Dots overlap; series look identical | Use plain lines with style variation |
+| Direct labels on each panel | Overlap; unreadable at small font sizes | Label only the first panel; use a shared legend if needed |
+| Font size differences (9pt vs 11pt) | Both render too small to distinguish | Use a single font size (the larger one) |
+| Range frames with bounded spines | Visual benefit is imperceptible | Simplify to plain axis removal (no spines) |
+| Per-point annotations | Clutter overwhelms the panel | Annotate only in a single "detail" panel |
+
+**General rule**: as panels shrink, remove visual elements rather than scaling them down. A clean, readable small panel is better than a miniaturized version of a full-size chart.
+
 ---
 
-## 8. Slope Charts (Slopegraphs)
+## 8. Cohesive Multi-Chart Design
+
+When generating multiple charts in a session (e.g., a set of 5 figures for a report or presentation), they will almost certainly be displayed together. Treat them as a unified visual system:
+
+- **Lock the color palette** — use the same color assignments across all charts. If "Revenue" is indigo in chart 1, it must be indigo in every chart
+- **Unify typography** — identical font family, base size, title size, and label size across all figures. Use the global constants (`TUFTE_FONT_SIZE`, `TUFTE_TITLE_SIZE`, etc.)
+- **Consistent axis styling** — same spine treatment, tick direction, and range-frame approach on every chart. Do not mix range frames and full axes
+- **Match figure dimensions** — use the same `figsize` (or width/height in Plotly) for charts that will sit side by side. Mismatched aspect ratios look accidental
+- **Harmonize data-ink weight** — line widths, marker sizes, and bar widths should be the same across charts unless there is a deliberate reason to differ
+- **Shared ordering** — if categories appear in multiple charts, keep the same sort order throughout
+
+Inconsistency between charts in a set is more noticeable than inconsistency within a single chart. When in doubt, re-check all previously generated charts in the session before finalizing a new one.
+
+---
+
+## 9. Slope Charts (Slopegraphs)
 
 For before/after or two-point-in-time comparisons:
 
@@ -218,13 +269,13 @@ For before/after or two-point-in-time comparisons:
 
 ---
 
-## 9. Post-Generation Checklist
+## 10. Post-Generation Checklist
 
 After generating any visualization code, verify it against `references/checklist.md`. Every item must pass. If any item fails, fix the code before presenting it to the user.
 
 ---
 
-## 10. User Override Protocol
+## 11. User Override Protocol
 
 If the user explicitly requests a banned element (e.g., "I need a pie chart for this presentation"):
 
@@ -236,7 +287,7 @@ Never silently comply with a banned element on the first request. Always educate
 
 ---
 
-## 11. Response Format
+## 12. Response Format
 
 When generating visualization code:
 

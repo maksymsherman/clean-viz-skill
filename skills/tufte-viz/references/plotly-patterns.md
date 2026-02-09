@@ -352,21 +352,50 @@ def tufte_heatmap(z, x_labels, y_labels, colorscale='Greys'):
 When comparing multiple series, use direct labels instead of a legend:
 
 ```python
+TUFTE_LINE_DASHES = ['solid', 'dash', 'dashdot', 'dot']
+
 def tufte_multi_line(x, y_dict, colors=None):
-    """Multiple line series with direct labels, no legend."""
+    """Multiple line series with direct labels, line style variation, and collision-aware labeling."""
     fig = go.Figure(layout=TUFTE_LAYOUT)
     palette = colors or [TUFTE_BLACK, TUFTE_MEDIUM_GRAY, TUFTE_ACCENT, TUFTE_LIGHT_GRAY]
 
     all_y = []
+    endpoints = []  # collect for collision-aware labeling
     for i, (name, y) in enumerate(y_dict.items()):
         color = palette[i % len(palette)]
+        dash = TUFTE_LINE_DASHES[i % len(TUFTE_LINE_DASHES)]
         fig.add_trace(go.Scatter(
             x=x, y=y, mode='lines',
-            line=dict(color=color, width=1.5),
+            line=dict(color=color, width=1.5, dash=dash),
             showlegend=False,
         ))
-        add_series_label(fig, x[-1], y[-1], name, color=color)
+        endpoints.append((x[-1], y[-1], name, color))
         all_y.extend(y)
+
+    # Collision-aware label placement: sort by y, enforce minimum gap.
+    # Gap is based on the number of labels relative to the y-range,
+    # ensuring labels don't overlap regardless of data scale.
+    endpoints_sorted = sorted(endpoints, key=lambda e: e[1])
+    y_range = max(all_y) - min(all_y)
+    n_labels = len(endpoints_sorted)
+    # Each label needs ~1.5 line-heights of space; scale to data units.
+    # If all labels were stacked, they'd need n_labels * gap units of room.
+    # Cap at 5% per label to avoid over-spreading on sparse data.
+    min_gap = min(y_range * 0.05, y_range / max(n_labels, 1) * 0.6)
+    display_ys = []
+    for i, (x_end, y_end, name, color) in enumerate(endpoints_sorted):
+        pos = y_end
+        if i > 0 and pos - display_ys[i - 1] < min_gap:
+            pos = display_ys[i - 1] + min_gap
+        display_ys.append(pos)
+        fig.add_annotation(
+            x=x_end, y=pos, text=name,
+            showarrow=pos != y_end,  # leader line if displaced
+            arrowhead=0, arrowwidth=0.6, arrowcolor=TUFTE_LIGHT_GRAY,
+            ax=0, ay=(y_end - pos) * 0.5 if pos != y_end else 0,
+            xanchor='left', xshift=8,
+            font=dict(family='Georgia, serif', size=11, color=color),
+        )
 
     apply_plotly_range_frame(fig, x, all_y)
     return fig

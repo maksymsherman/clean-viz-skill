@@ -191,7 +191,19 @@ function directLabel(svg, x, y, text, color = TUFTE.textColor) {
 }
 ```
 
-### Line Chart with Dot Emphasis
+### Multi-Series Differentiation
+
+For multi-series charts, vary `stroke-dasharray` alongside color:
+
+```javascript
+const TUFTE_DASHES = ['', '6,3', '6,3,2,3', '2,3'];  // solid, dash, dash-dot, dot
+// Usage: .attr('stroke-dasharray', TUFTE_DASHES[i])
+```
+
+The dot-emphasis technique (below) works for single-series only. For multi-series, use
+line style variation instead — the white mask circles homogenize dots across series.
+
+### Line Chart with Dot Emphasis (Single Series)
 
 ```javascript
 function tufteLine(svg, data, xScale, yScale, color = TUFTE.lineColor) {
