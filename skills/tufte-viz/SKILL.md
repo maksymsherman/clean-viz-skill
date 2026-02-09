@@ -163,7 +163,23 @@ Read `references/general-patterns.md` for:
 
 ---
 
-## 5. Sparklines
+## 5. Python Environment & Dependency Setup
+
+Before running generated Python visualization code, ensure the required libraries are installed.
+
+### Prefer `uv` over `pip`
+1. **Check for `uv`** — run `which uv` to see if it is available
+2. If `uv` is found:
+   - If no `pyproject.toml` exists, run `uv init --bare` to create a minimal one
+   - Then run `uv add <packages>` (e.g., `uv add matplotlib seaborn numpy`) to install dependencies
+3. If `uv` is not found, fall back to `pip install <packages>`
+
+### Safety: never run bare `uv init`
+**Never run `uv init` without the `--bare` flag** in an existing repository. Plain `uv init` overwrites `.gitignore`, creates a `README.md`, and can disrupt git history. Only `uv init --bare` is safe — it creates a minimal `pyproject.toml` and nothing else.
+
+---
+
+## 6. Sparklines
 
 Sparklines are intense, simple, word-sized graphics. When creating sparklines:
 
@@ -176,7 +192,7 @@ Sparklines are intense, simple, word-sized graphics. When creating sparklines:
 
 ---
 
-## 6. Small Multiples
+## 7. Small Multiples
 
 When comparing data across categories, time periods, or groups:
 
@@ -189,7 +205,7 @@ When comparing data across categories, time periods, or groups:
 
 ---
 
-## 7. Slope Charts (Slopegraphs)
+## 8. Slope Charts (Slopegraphs)
 
 For before/after or two-point-in-time comparisons:
 
@@ -202,13 +218,13 @@ For before/after or two-point-in-time comparisons:
 
 ---
 
-## 8. Post-Generation Checklist
+## 9. Post-Generation Checklist
 
 After generating any visualization code, verify it against `references/checklist.md`. Every item must pass. If any item fails, fix the code before presenting it to the user.
 
 ---
 
-## 9. User Override Protocol
+## 10. User Override Protocol
 
 If the user explicitly requests a banned element (e.g., "I need a pie chart for this presentation"):
 
@@ -220,7 +236,7 @@ Never silently comply with a banned element on the first request. Always educate
 
 ---
 
-## 10. Response Format
+## 11. Response Format
 
 When generating visualization code:
 
