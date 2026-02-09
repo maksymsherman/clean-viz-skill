@@ -135,6 +135,7 @@ Do NOT generate these chart types. If the user requests one, explain the visuali
 | Radar/spider chart | Angle encoding is misleading; area distortion | Small multiples of bar charts or dot plots |
 | Stacked area (>3 series) | Middle series are impossible to read | Small multiples of line charts |
 | Bubble chart | Area perception is poor | Scatter with direct labels |
+| Summary-only categorical (e.g., bar of means, dot plot of medians when n>10/group) | Hides distribution shape, outliers, and sample size; wastes available data | Strip/jitter/beeswarm plot with summary statistic overlaid |
 
 ### Banned Visual Elements
 - **No background colors or images** — white background only
@@ -274,7 +275,7 @@ For before/after or two-point-in-time comparisons:
 
 ## 10. Post-Generation Checklist
 
-After generating any visualization code, verify it against `references/checklist.md`. Every item must pass. If any item fails, fix the code before presenting it to the user.
+After generating any visualization code, you MUST write out the full checklist from `references/checklist.md` as a visible markdown table in your response, with pass/fail for every item. This is not optional. If any item fails, fix the code and re-run the checklist before presenting the final version to the user. A visualization without a written checklist is incomplete.
 
 ---
 
@@ -297,4 +298,4 @@ When generating visualization code:
 1. State which visualization principles are being applied (brief, 1-2 lines)
 2. Provide the complete, runnable code
 3. Include a brief note on what was intentionally omitted and why (e.g., "Legend removed: series are directly labeled")
-4. Run through the checklist mentally; note any items that could not be satisfied and why
+4. **Write out the checklist** — after the code block, include a markdown table with every checklist item and its pass/fail status. If any item fails, fix the code BEFORE presenting it. Do not skip this step or perform it silently. The written checklist is part of the deliverable.

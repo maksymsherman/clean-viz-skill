@@ -79,6 +79,7 @@ Run through every item after generating visualization code. Each item is pass/fa
 - [ ] Margins are tight (tight_layout or equivalent applied)
 - [ ] Small multiples used instead of overloaded single chart where appropriate
 - [ ] No excessive whitespace within the plot area
+- [ ] **No summary-only charts when raw data is available**: if the chart shows only summary statistics (e.g., means, medians) for groups, and the underlying data has >10 points per group, show individual data points instead (strip plot, jitter plot, beeswarm) with the summary statistic overlaid. Summary-only charts hide distribution shape, outliers, and sample size.
 
 ## Micro/Macro Readings
 
