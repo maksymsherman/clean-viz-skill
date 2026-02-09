@@ -28,19 +28,28 @@ This skill auto-triggers whenever you ask Claude to create charts, plots, or vis
 
 ## Installation
 
-Clone this repository, then point Claude Code at it:
+### From the plugin marketplace (recommended)
 
-```bash
-git clone https://github.com/YOUR_USERNAME/tufte-viz-skill.git
-claude --plugin-dir /path/to/tufte-viz-skill
+Inside Claude Code, run:
+
+```
+/plugin marketplace add maksymsherman/tufte-viz-skill
+/plugin install tufte-viz@maksymsherman-tufte-viz-skill
 ```
 
-Or add it to your Claude Code configuration:
+You can scope the installation:
 
-```json
-{
-  "plugins": ["/path/to/tufte-viz-skill"]
-}
+```
+/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope user      # all your projects (default)
+/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope project   # shared with collaborators
+/plugin install tufte-viz@maksymsherman-tufte-viz-skill --scope local     # this repo only
+```
+
+### From a local clone
+
+```bash
+git clone https://github.com/maksymsherman/tufte-viz-skill.git
+claude --plugin-dir /path/to/tufte-viz-skill
 ```
 
 ## How it works
