@@ -1,0 +1,25 @@
+{
+  "name": "tufte-viz-skill",
+  "owner": {
+    "name": "maksymsherman"
+  },
+  "plugins": [
+    {
+      "name": "tufte-viz",
+      "source": "./",
+      "description": "Enforces Edward Tufte's data visualization principles for publication-quality, chartjunk-free graphics",
+      "version": "1.0.0",
+      "license": "MIT",
+      "keywords": [
+        "tufte",
+        "data-visualization",
+        "matplotlib",
+        "plotly",
+        "seaborn",
+        "altair",
+        "d3",
+        "ggplot2"
+      ]
+    }
+  ]
+}
