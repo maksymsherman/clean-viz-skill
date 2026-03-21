@@ -75,7 +75,10 @@ Apply ALL of the following to every visualization:
 - **Remove top and right spines** — they are non-data-ink
 - **Use range frames** — bind left/bottom spine extents to the data range (`ax.spines['left'].set_bounds(min_y, max_y)`)
 - **Tick marks face inward** — `tick_params(direction='in')`
-- **Reduce tick density** — only label meaningful values; avoid matplotlib/plotly defaults. Range frame endpoints anchor to the actual data min/max (which may not be round). Interior ticks between those bounds should land on clean round intervals (every 5, 10, 25, etc.) — prefer manually chosen ticks when auto-locators produce awkward spacing (e.g., 72, 76, 81 instead of 70, 75, 80)
+- **Reduce tick density** — only label meaningful values; avoid matplotlib/plotly defaults. Separate two concerns:
+  - **Spine bounds** communicate the data extent and must match the actual data min/max (this is the range frame)
+  - **Tick labels** are a reading aid and must use clean round intervals (every 5, 10, 25, etc.). Do not force non-round data min/max values (e.g., 1613, 5140) as tick labels — they add visual noise without aiding interpretation. Only show a data-exact endpoint tick when the value is inherently meaningful (a specific year, a regulatory threshold, a named benchmark)
+  - Prefer manually chosen ticks when auto-locators produce awkward spacing (e.g., 72, 76, 81 instead of 70, 75, 80). After calling any range-frame helper, review the resulting ticks and override them if they are non-round or too dense
 
 ### Typography
 - **Use a serif font** — `'serif'` family (or specify Georgia, Palatino, Times New Roman)
@@ -106,7 +109,7 @@ Apply ALL of the following to every visualization:
 
 ### Color
 - **Default to grayscale** — use black, dark gray (`#333333`), medium gray (`#888888`), light gray (`#cccccc`)
-- **Single accent color** — when emphasis is needed, use exactly one color (default: `#c0392b` muted red). Accent must be **selective**: applying it to every item in a group (e.g., every median line, every bar) defeats emphasis and turns it into a second default color. Use accent only for the one element that the chart's story is about; render the rest in grayscale
+- **Single accent color** — when emphasis is needed, use exactly one color (default: `#c0392b` muted red). Accent must be **selective**: applying it to every item in a group (e.g., every median line, every bar) defeats emphasis and turns it into a second default color. Use accent only for the one element that the chart's story is about; render the rest in grayscale. **Exception — summary overlays on raw data**: when accent distinguishes a different *layer of information* (e.g., median markers on top of a jitter cloud), applying it to every group is acceptable because it separates summary from observation, not one category from another
 - **Narrative-driven color** — when a chart's title or story highlights one category (e.g., "Japanese cars dominate"), do not assign palette colors to every category. Instead, use grayscale for context categories and accent for the focal category. Reserve the multi-color palette for charts where every category is equally important and must be individually identified
 - **Colorblind-safe palette** — when multiple colors are required, use the Paul Tol palette ordered by contrast (high-contrast first):
   - `#332288` (indigo), `#CC6677` (rose), `#117733` (green), `#882255` (wine),
@@ -144,7 +147,7 @@ Do NOT generate these chart types. If the user requests one, explain the visuali
 | Radar/spider chart | Angle encoding is misleading; area distortion | Small multiples of bar charts or dot plots |
 | Stacked area (>3 series) | Middle series are impossible to read | Small multiples of line charts |
 | Bubble chart | Area perception is poor | Scatter with direct labels |
-| Summary-only categorical (e.g., bar of means, dot plot of medians when n>10/group) | Hides distribution shape, outliers, and sample size; wastes available data | Strip/jitter/beeswarm plot with summary statistic overlaid |
+| Summary-only categorical (e.g., bar of means, dot plot of medians when n>10/group) | Hides distribution shape, outliers, and sample size; wastes available data | Strip/jitter/beeswarm plot with summary statistic overlaid. **Small groups (n<~10)**: do not overlay summary statistics — a median of 3 points is not meaningful. Show the raw points without value labels (the axis communicates values); the sparse cluster itself honestly signals limited data. Show n per group only when group sizes vary enough to affect interpretation |
 
 ### Banned Visual Elements
 - **No background colors or images** — white background only

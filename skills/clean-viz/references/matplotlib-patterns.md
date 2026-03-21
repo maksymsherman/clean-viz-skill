@@ -89,11 +89,21 @@ CLEAN_LINE_COLORS = CLEAN_COLORS[:6]
 
 ## Range Frame Helper
 
-Bind spine extents to the actual data range:
+Spine bounds communicate the data extent (the range frame). Tick labels are a
+separate concern — they should land on clean round intervals for readability.
+Do not force non-round data min/max as tick labels. After calling this helper,
+review the auto-generated ticks and override with `set_xticks`/`set_yticks`
+if they are non-round or awkwardly spaced.
 
 ```python
 def apply_range_frame(ax, x, y, pad_fraction=0.05):
-    """Apply range frames with tight limits and ticks clipped to the data range."""
+    """Apply range frames: spine bounds match data range, ticks use round intervals.
+
+    Important: this helper sets spine bounds and generates initial ticks via
+    MaxNLocator. The auto-ticks are filtered to the data range but may still
+    land on non-round values. Always review and override with manual ticks
+    (ax.set_xticks / ax.set_yticks) after calling this function.
+    """
     x_min, x_max = min(x), max(x)
     y_min, y_max = min(y), max(y)
     x_pad = (x_max - x_min) * pad_fraction or 1
@@ -109,7 +119,8 @@ def apply_range_frame(ax, x, y, pad_fraction=0.05):
     ax.xaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
     ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=5))
 
-    # Filter auto-generated ticks back to the data range so the range frame stays honest.
+    # Filter auto-generated ticks to the data range.
+    # These are starting-point ticks — override if non-round or awkward.
     ax.figure.canvas.draw()
     ax.set_xticks([tick for tick in ax.get_xticks() if x_min <= tick <= x_max])
     ax.set_yticks([tick for tick in ax.get_yticks() if y_min <= tick <= y_max])
@@ -626,6 +637,60 @@ def clean_scatter(ax, x, y, color=CLEAN_BLACK, label_points=None):
                 xytext=(5, 5), textcoords='offset points',
                 fontsize=CLEAN_SMALL_SIZE, fontfamily='serif', color=CLEAN_BLACK,
             )
+```
+
+---
+
+## Strip Plot (Jitter) with Summary Overlay
+
+Preferred substitute for bar-of-means. Adapts treatment to group size:
+groups with n<10 show raw points only (no summary); larger groups get a
+median overlay in accent color.
+
+```python
+def clean_strip_plot(ax, groups, values_per_group, min_n_for_summary=10):
+    """Strip plot that adapts to group size.
+
+    Args:
+        ax: matplotlib Axes
+        groups: list of group labels
+        values_per_group: dict of {label: array of values}
+        min_n_for_summary: groups below this show raw points only
+    """
+    show_n = False
+    sizes = [len(v) for v in values_per_group.values()]
+    # Show n labels only when group sizes vary enough to matter
+    if max(sizes) > 2 * min(sizes) or min(sizes) < min_n_for_summary:
+        show_n = True
+
+    for i, label in enumerate(groups):
+        vals = values_per_group[label]
+        n = len(vals)
+
+        if n >= min_n_for_summary:
+            jitter = np.random.default_rng(42).uniform(-0.15, 0.15, n)
+            ax.scatter(np.full(n, i) + jitter, vals,
+                       color=CLEAN_LIGHT_GRAY, s=14, alpha=0.6, edgecolors='none')
+            median = np.median(vals)
+            ax.scatter(i, median, color=CLEAN_ACCENT, s=40, zorder=5,
+                       edgecolors='none', marker='D')
+            ax.text(i + 0.25, median, f'{median:.0f}',
+                    fontsize=CLEAN_SMALL_SIZE, fontfamily='serif',
+                    color=CLEAN_BLACK, va='center')
+        else:
+            # Sparse group: raw points only, no summary, no value labels
+            ax.scatter(np.full(n, i), vals,
+                       color=CLEAN_BLACK, s=24, zorder=5, edgecolors='none')
+
+        if show_n:
+            ax.text(i, ax.get_ylim()[0], f'n={n}', ha='center',
+                    fontsize=CLEAN_SMALL_SIZE, fontfamily='serif',
+                    color=CLEAN_MEDIUM_GRAY)
+
+    ax.set_xticks(range(len(groups)))
+    ax.set_xticklabels(groups)
+    ax.spines['bottom'].set_visible(False)
+    ax.tick_params(bottom=False)
 ```
 
 ---

@@ -33,7 +33,7 @@ These are mandatory for every chart, even if no rendering step is available.
 - [ ] Bottom and left axis lines are bounded to the data range, or the closest library-specific approximation is used
 - [ ] Tick marks face inward or use the closest library-specific approximation
 - [ ] Tick density is reduced from library defaults
-- [ ] Interior ticks land on clean round intervals (endpoints may reflect actual data min/max per range frame rules)
+- [ ] Tick labels use clean round intervals — non-round data min/max are communicated by spine bounds, not tick labels (unless the exact value is inherently meaningful)
 - [ ] No rotated tick labels unless the library leaves no reasonable alternative
 - [ ] After any axis padding for labels, tick marks and range-frame bounds remain anchored to the data range
 - [ ] Small multiples share scales when comparisons depend on shared scale
@@ -68,6 +68,7 @@ These are mandatory for every chart, even if no rendering step is available.
 - [ ] Margins are tightened (`tight_layout()` or equivalent)
 - [ ] Small multiples are used instead of overloading a single chart when needed
 - [ ] Summary-only categorical charts are avoided when raw data is available and distribution matters
+- [ ] No summary statistics overlaid on groups with fewer than ~10 observations
 - [ ] The response includes complete runnable code
 - [ ] The response includes an audit summary with `Code checks`, `Rendered checks`, and `Session consistency`
 
