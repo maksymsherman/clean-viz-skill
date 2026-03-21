@@ -55,6 +55,7 @@ These are mandatory for every chart, even if no rendering step is available.
 - [ ] Default palette is grayscale
 - [ ] At most one accent color is used for emphasis, and it is applied selectively (not uniformly to every item in a group)
 - [ ] When the chart's narrative highlights one category, grayscale + accent is used instead of multi-color palette
+- [ ] No two distinguishable categories share the same color when there are roughly 8 or fewer categories
 - [ ] No rainbow, jet, or spectral colormaps
 - [ ] If multiple colors are necessary, use a colorblind-safe palette
 - [ ] Low-contrast colors are not used for thin lines or small text on white
