@@ -33,6 +33,7 @@ These are mandatory for every chart, even if no rendering step is available.
 - [ ] Bottom and left axis lines are bounded to the data range, or the closest library-specific approximation is used
 - [ ] Tick marks face inward or use the closest library-specific approximation
 - [ ] Tick density is reduced from library defaults
+- [ ] Interior ticks land on clean round intervals (endpoints may reflect actual data min/max per range frame rules)
 - [ ] No rotated tick labels unless the library leaves no reasonable alternative
 - [ ] After any axis padding for labels, tick marks and range-frame bounds remain anchored to the data range
 - [ ] Small multiples share scales when comparisons depend on shared scale
@@ -52,7 +53,8 @@ These are mandatory for every chart, even if no rendering step is available.
 ### Color and Styling
 
 - [ ] Default palette is grayscale
-- [ ] At most one accent color is used for emphasis
+- [ ] At most one accent color is used for emphasis, and it is applied selectively (not uniformly to every item in a group)
+- [ ] When the chart's narrative highlights one category, grayscale + accent is used instead of multi-color palette
 - [ ] No rainbow, jet, or spectral colormaps
 - [ ] If multiple colors are necessary, use a colorblind-safe palette
 - [ ] Low-contrast colors are not used for thin lines or small text on white

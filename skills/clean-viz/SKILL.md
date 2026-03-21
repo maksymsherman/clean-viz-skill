@@ -75,7 +75,7 @@ Apply ALL of the following to every visualization:
 - **Remove top and right spines** — they are non-data-ink
 - **Use range frames** — bind left/bottom spine extents to the data range (`ax.spines['left'].set_bounds(min_y, max_y)`)
 - **Tick marks face inward** — `tick_params(direction='in')`
-- **Reduce tick density** — only label meaningful values; avoid matplotlib/plotly defaults
+- **Reduce tick density** — only label meaningful values; avoid matplotlib/plotly defaults. Range frame endpoints anchor to the actual data min/max (which may not be round). Interior ticks between those bounds should land on clean round intervals (every 5, 10, 25, etc.) — prefer manually chosen ticks when auto-locators produce awkward spacing (e.g., 72, 76, 81 instead of 70, 75, 80)
 
 ### Typography
 - **Use a serif font** — `'serif'` family (or specify Georgia, Palatino, Times New Roman)
@@ -106,7 +106,8 @@ Apply ALL of the following to every visualization:
 
 ### Color
 - **Default to grayscale** — use black, dark gray (`#333333`), medium gray (`#888888`), light gray (`#cccccc`)
-- **Single accent color** — when emphasis is needed, use exactly one color (default: `#c0392b` muted red)
+- **Single accent color** — when emphasis is needed, use exactly one color (default: `#c0392b` muted red). Accent must be **selective**: applying it to every item in a group (e.g., every median line, every bar) defeats emphasis and turns it into a second default color. Use accent only for the one element that the chart's story is about; render the rest in grayscale
+- **Narrative-driven color** — when a chart's title or story highlights one category (e.g., "Japanese cars dominate"), do not assign palette colors to every category. Instead, use grayscale for context categories and accent for the focal category. Reserve the multi-color palette for charts where every category is equally important and must be individually identified
 - **Colorblind-safe palette** — when multiple colors are required, use the Paul Tol palette ordered by contrast (high-contrast first):
   - `#332288` (indigo), `#CC6677` (rose), `#117733` (green), `#882255` (wine),
     `#44AA99` (teal), `#AA4499` (purple), `#88CCEE` (cyan), `#999933` (olive)
