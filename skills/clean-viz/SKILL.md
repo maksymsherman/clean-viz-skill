@@ -83,7 +83,7 @@ Apply ALL of the following to every visualization:
 - **Annotations in data space** — use `ax.text()` or `ax.annotate()` positioned in data coordinates, not as axis labels when labeling specific points
 
 ### Labeling
-- **Direct labeling over legends** — place text labels next to data series; remove the legend box entirely when possible
+- **Direct labeling over legends** — place text labels next to data series; remove the legend box entirely when possible. This works well for line charts (label at endpoints) and bar charts (label bars directly). However, for **grouped scatter plots** where clusters overlap spatially, direct labels placed near centroids will inevitably sit on top of other groups' points and become unreadable. In this case, use a minimal legend (no border, placed in a clear margin area) with marker shape swatches instead of forcing direct labels into shared data space
 - **Handle label collisions** — centroid-based placement (e.g., placing labels at the endpoint of each line) will collide whenever groups have similar values. When multiple labels cluster together:
   - Use vertical offset stacking: sort labels by y-value and enforce a minimum gap
   - Prefer edge-of-cluster placement (e.g., percentile-based anchors) over centroids
