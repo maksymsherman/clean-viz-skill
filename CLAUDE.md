@@ -1,10 +1,14 @@
 # clean-viz-skill
 
-A Claude Code skill that applies Edward Tufte's data visualization principles to every chart generated. See `skills/clean-viz/SKILL.md` for the full skill specification.
+An installable chart-quality skill for Claude Code and Codex. Claude Code consumes the plugin metadata in `.claude-plugin/`; Codex installs the skill payload from `skills/clean-viz/`, either manually or via `install.sh`.
 
 ## Project Structure
 
 ```
+install.sh               # Repo-level installer for Codex; copies skills/clean-viz into ~/.codex/skills
+.claude-plugin/
+  plugin.json           # Claude Code plugin metadata
+  marketplace.json      # Claude marketplace metadata
 skills/clean-viz/
   SKILL.md              # Main skill definition (triggers, rules, banned types)
   references/
