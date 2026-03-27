@@ -1,11 +1,11 @@
 # clean-viz-skill
 
-An installable chart-quality skill for Claude Code and Codex. Claude Code consumes the plugin metadata in `.claude-plugin/`; Codex installs the skill payload from `skills/clean-viz/`, either manually or via `install.sh`.
+An installable chart-quality skill for Codex, Claude Code, and Gemini CLI. The runtime payload lives in `skills/clean-viz/`, and `install.sh` installs that same skill into each tool's local `skills/` directory.
 
 ## Project Structure
 
 ```
-install.sh               # Repo-level installer for Codex; copies skills/clean-viz into ~/.codex/skills
+install.sh               # Repo-level installer; copies skills/clean-viz into ~/.codex/skills, ~/.claude/skills, and ~/.gemini/skills
 .claude-plugin/
   plugin.json           # Claude Code plugin metadata
   marketplace.json      # Claude marketplace metadata
