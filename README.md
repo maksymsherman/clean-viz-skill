@@ -193,6 +193,12 @@ curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/
 # install only into a custom skills directory
 curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --dest /custom/skills
 
+# install from a local checkout instead of GitHub
+bash install.sh --local-repo . --dest /tmp/clean-viz-skill-test
+
+# install under a different skill name
+curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --name clean-viz-experimental
+
 # install from a different git ref
 curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --ref main
 ```
@@ -203,6 +209,9 @@ If you want the repo extras as well:
 
 ```bash
 git clone https://github.com/maksymsherman/clean-viz-skill.git
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+mkdir -p "${CLAUDE_HOME:-$HOME/.claude}/skills"
+mkdir -p "${GEMINI_HOME:-$HOME/.gemini}/skills"
 cp -R clean-viz-skill/skills/clean-viz "${CODEX_HOME:-$HOME/.codex}/skills/clean-viz"
 cp -R clean-viz-skill/skills/clean-viz "${CLAUDE_HOME:-$HOME/.claude}/skills/clean-viz"
 cp -R clean-viz-skill/skills/clean-viz "${GEMINI_HOME:-$HOME/.gemini}/skills/clean-viz"
@@ -217,6 +226,26 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 ```
 
 Restart Codex, Claude Code, or Gemini CLI after installation so the new skill is picked up.
+
+### Installer environment overrides
+
+`install.sh` also supports environment overrides when you need to point at a fork or change the packaged skill path:
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `OWNER` | GitHub owner for archive downloads | `maksymsherman` |
+| `REPO` | GitHub repo for archive downloads | `clean-viz-skill` |
+| `REF` | Git ref to download | `main` |
+| `SKILL_PATH` | Skill directory inside the repo | `skills/clean-viz` |
+| `TARGETS` | Default target list when `--targets` is omitted | `codex,claude,gemini` |
+| `SKILL_NAME` | Installed directory name | `clean-viz` |
+
+Example:
+
+```bash
+OWNER=your-org REPO=clean-viz-skill REF=feature-branch \
+curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash
+```
 
 ---
 
@@ -265,6 +294,9 @@ Critique this dashboard figure and explain what violates graphical integrity.
 | `curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --targets codex,claude` | Install only to selected agent skill roots |
 | `curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --force` | Replace existing installs for the selected targets |
 | `curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --dest /custom/skills` | Install only to one custom skills directory |
+| `bash install.sh --local-repo . --dest /tmp/clean-viz-skill-test` | Install from the current checkout without downloading from GitHub |
+| `curl -fsSL https://raw.githubusercontent.com/maksymsherman/clean-viz-skill/main/install.sh | bash -s -- --name clean-viz-experimental` | Install under a different skill directory name |
+| `bash install.sh --help` | Show the full installer surface, including `--quiet` and environment overrides |
 | `uv run --with matplotlib --with numpy --with pandas python examples/mpg_five_charts.py` | Render the sample charts |
 | `python3 eval/check_response.py --case matplotlib-line response.md` | Check one saved response against a canonical case |
 | `python3 eval/check_response.py --responses-dir /path/to/responses` | Check a directory of saved responses |
