@@ -17,7 +17,7 @@ mpg
   <img alt="Codex compatible" src="https://img.shields.io/badge/Codex-compatible-0A7EA4">
 </p>
 
-<p align="center"><strong>Make chart requests come back with range frames, direct labels, honest audit summaries, and no chartjunk.</strong></p>
+<p align="center"><strong>A reusable skill that turns every AI-generated chart into a clean, honest, Tufte-style visualization — range frames, direct labels, no chartjunk.</strong></p>
 
 For Claude Code:
 
@@ -35,36 +35,29 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 
 > Note: This project is not affiliated with Edward Tufte. It applies visualization principles described in his published works.
 
+---
+
 ## TL;DR
 
-### The Problem
+**The Problem:** AI chart generation defaults to heavy gridlines, legends instead of labels, decorative color, and chart types (pie, 3D, dual-axis) that distort data. Every session starts with the same cleanup instructions.
 
-Default chart generation tends to produce the same problems over and over:
+**The Solution:** `clean-viz` is a skill for Claude Code and Codex that activates automatically on chart requests, enforces a strict house style, substitutes banned chart types with honest alternatives, and requires a three-part audit summary before the agent finishes.
 
-- legends when direct labels would be clearer
-- heavy gridlines and extra spines
-- decorative color instead of readable structure
-- pie charts, 3D charts, and dual-axis charts that distort the data
-- vague claims that a chart was "checked" without any real visual verification
-
-### The Solution
-
-`clean-viz` is a reusable skill for Claude Code and Codex that activates on real visualization requests. It applies a strict house style, loads library-specific reference patterns on demand, substitutes banned chart types with better forms, and requires an explicit audit summary before the agent finishes.
-
-### Why Use clean-viz?
+### Why use clean-viz?
 
 | Need | What clean-viz does | Where it lives |
 |---|---|---|
-| Cleaner defaults | Removes chartjunk, uses serif typography, trims axes to the data range | [`skills/clean-viz/SKILL.md`](skills/clean-viz/SKILL.md) |
-| Honest verification | Separates code checks from rendered checks so the agent does not fake visual QA | [`skills/clean-viz/references/checklist.md`](skills/clean-viz/references/checklist.md) |
-| Better library output | Ships concrete patterns for matplotlib, seaborn, Plotly, Altair, D3.js, ggplot2, and Observable Plot | [`skills/clean-viz/references/`](skills/clean-viz/references/) |
-| Safer chart choices | Refuses pie, donut, radar, 3D, and dual-axis charts and proposes substitutes | [`skills/clean-viz/SKILL.md`](skills/clean-viz/SKILL.md) |
-| Regression checking | Includes a tracked smoke-test harness for saved model responses | [`eval/`](eval/) |
-| Reference rendering | Verifies the runnable chart examples in the markdown docs | [`eval/verify_reference_examples.py`](eval/verify_reference_examples.py) |
+| **Cleaner defaults** | Removes chartjunk, uses serif typography, trims axes to the data range | [`SKILL.md`](skills/clean-viz/SKILL.md) |
+| **Honest verification** | Separates code checks from rendered checks so the agent cannot fake visual QA | [`checklist.md`](skills/clean-viz/references/checklist.md) |
+| **Library-specific patterns** | Ships concrete, runnable patterns for matplotlib, seaborn, Plotly, Altair, D3.js, ggplot2, and Observable Plot | [`references/`](skills/clean-viz/references/) |
+| **Safer chart choices** | Refuses pie, donut, radar, 3D, and dual-axis charts and proposes substitutes | [`SKILL.md`](skills/clean-viz/SKILL.md) |
+| **Regression checking** | Tracked smoke-test harness for saved model responses | [`eval/`](eval/) |
+
+---
 
 ## Quick Example
 
-1. Install the skill in Claude Code:
+1. Install the skill:
 
 ```bash
 /plugin install clean-viz@maksymsherman-clean-viz-skill
@@ -84,29 +77,45 @@ Critique this Plotly chart and restyle it to match the clean-viz rules.
 Call out anything you could not visually verify.
 ```
 
-4. Ask for a banned chart type and watch the substitution behavior:
+4. Ask for a banned chart type and watch the substitution:
 
 ```text
 Make this market-share view as a pie chart.
 ```
 
-5. Render the repository's sample charts locally:
+The skill explains why pie charts are banned (poor area perception, low data-ink ratio), offers a horizontal bar chart instead, and only complies if the user insists after seeing the alternative.
+
+5. Render the sample charts locally:
 
 ```bash
 uv run --with matplotlib --with numpy --with pandas python examples/mpg_five_charts.py
 ```
 
-That script writes five example PNGs into [`examples/output/`](examples/output/), including a grouped scatter, a direct-labeled multi-line chart, a strip plot, a horizontal bar chart, and a small-multiples view.
+---
+
+## Gallery
+
+Five example charts generated from the classic MPG dataset, all following clean-viz rules:
+
+| Chart | What it demonstrates |
+|---|---|
+| ![Weight vs MPG scatter](examples/output/chart1_weight_vs_mpg.png) | Grouped scatter with narrative accent color, minimal legend, range frames |
+| ![MPG trend by origin](examples/output/chart2_mpg_trend_by_origin.png) | Multi-line chart with line style variation, direct end-of-line labels, collision avoidance |
+| ![MPG by cylinders](examples/output/chart3_mpg_by_cylinders.png) | Strip plot with median overlay — raw data shown instead of summary-only bar chart |
+| ![Median MPG by origin](examples/output/chart4_median_mpg_by_origin.png) | Horizontal bar with direct value labels, accent for focal category, no gridlines |
+| ![Displacement vs MPG faceted](examples/output/chart5_displacement_vs_mpg_faceted.png) | Small multiples with shared axes, accent for focal category |
+
+---
 
 ## Design Philosophy
 
 ### 1. Lead with the data, not the furniture
 
-The skill removes non-data ink first: extra spines, decorative fills, heavy gridlines, border-heavy legends, and default styling noise.
+Remove non-data ink first: extra spines, decorative fills, heavy gridlines, border-heavy legends, and default styling noise.
 
 ### 2. Label the marks directly
 
-Legends force eye travel. The skill prefers direct labels, end-of-line annotations, and data-space callouts whenever that is readable.
+Legends force eye travel. Direct labels, end-of-line annotations, and data-space callouts are preferred whenever readable.
 
 ### 3. Refuse misleading chart forms
 
@@ -114,25 +123,38 @@ Pie charts, radar charts, 3D charts, and dual-axis composites are banned because
 
 ### 4. Be explicit about what was actually checked
 
-The audit model distinguishes between code checks, rendered checks, and session-consistency checks. If the chart was not rendered, the skill must say so.
+The audit model distinguishes code checks, rendered checks, and session-consistency checks. If the chart was not rendered, the skill says so.
 
 ### 5. Go deep where it matters
 
 Primary support is strongest for matplotlib, seaborn, and Plotly. Other libraries get practical patterns, but the deepest coverage is concentrated where most generated code lands.
 
+---
+
 ## Comparison
 
 | Approach | What you get | Tradeoff |
 |---|---|---|
-| Default chart prompting | Fast, but usually generic styling and inconsistent chart judgment | You repeat the same cleanup instructions every time |
-| A one-off prompt snippet in your notes | Better than defaults and easy to paste | No shared reference patterns, no tracked eval harness, easy to drift |
-| `clean-viz-skill` | Triggered skill, chart-type substitution rules, library references, audit gate, and regression checks | Intentionally opinionated and not meant for every visual style |
+| **Default chart prompting** | Fast, but generic styling and inconsistent chart judgment | You repeat the same cleanup instructions every time |
+| **A prompt snippet in your notes** | Better than defaults, easy to paste | No shared reference patterns, no eval harness, drifts over time |
+| **`clean-viz-skill`** | Triggered skill, chart-type substitution, library references, three-part audit gate, and regression checks | Intentionally opinionated and not meant for every visual style |
+
+**When clean-viz is ideal:**
+- Reports, analysis notebooks, and presentations where clarity matters more than branding
+- Any workflow where you want consistent, reproducible chart quality across sessions
+- Teams that want a shared visual standard without writing their own prompt library
+
+**When clean-viz might not be ideal:**
+- Brand-heavy marketing materials that need specific color palettes and decorative elements
+- Artistic or editorial illustrations where the goal is aesthetic impact, not data clarity
+
+---
 
 ## Installation
 
 ### 1. Claude Code marketplace
 
-Recommended if you want the skill managed like a normal plugin:
+Recommended for managed plugin installation:
 
 ```bash
 /plugin marketplace add maksymsherman/clean-viz-skill
@@ -149,7 +171,7 @@ You can scope the install:
 
 ### 2. Codex skill installer from GitHub
 
-Recommended if you use Codex and want the shared skill directory installed directly:
+Recommended for Codex users:
 
 ```bash
 python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -167,15 +189,17 @@ git clone https://github.com/maksymsherman/clean-viz-skill.git
 claude --plugin-dir /path/to/clean-viz-skill
 ```
 
+---
+
 ## Quick Start
 
 1. Install the skill using one of the methods above.
 2. Restart Claude Code or Codex if the new skill does not appear immediately.
-3. Ask for a real visualization request, not a generic use of the word "plot" or "graph".
-4. Name the target library when you care about the output surface, for example matplotlib or Plotly.
+3. Ask for a real visualization request, not a generic use of the word "plot" or "graph."
+4. Name the target library when you care about the output surface (e.g., matplotlib or Plotly).
 5. Ask for critique, restyling, or generation. The skill covers all three.
 6. Review the audit summary at the end of the answer.
-7. If you want to customize behavior, edit the markdown files in [`skills/clean-viz/`](skills/clean-viz/).
+7. To customize behavior, edit the markdown files in [`skills/clean-viz/`](skills/clean-viz/).
 
 Prompt patterns that trigger the skill well:
 
@@ -185,21 +209,25 @@ Restyle this matplotlib chart to follow the clean-viz rules.
 Critique this dashboard figure and explain what violates graphical integrity.
 ```
 
+---
+
 ## Command Reference
 
 | Command | Purpose |
 |---|---|
-| `/plugin marketplace add maksymsherman/clean-viz-skill` | Adds the repository to Claude Code's plugin marketplace list |
-| `/plugin install clean-viz@maksymsherman-clean-viz-skill` | Installs the skill in Claude Code |
-| `python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py --url https://github.com/maksymsherman/clean-viz-skill/tree/main/skills/clean-viz` | Installs the shared skill into Codex |
-| `uv run --with matplotlib --with numpy --with pandas python examples/mpg_five_charts.py` | Renders the sample charts in [`examples/`](examples/) |
-| `python3 eval/check_response.py --case matplotlib-line /path/to/response.md` | Checks one saved response against a canonical case |
-| `python3 eval/check_response.py --responses-dir /path/to/responses` | Checks a directory of saved responses in batch mode |
-| `uv run --with matplotlib --with numpy --with seaborn --with plotly --with kaleido --with pandas --with altair --with vl-convert-python python eval/verify_reference_examples.py` | Renders and verifies the runnable reference examples |
+| `/plugin marketplace add maksymsherman/clean-viz-skill` | Add the repository to Claude Code's plugin marketplace list |
+| `/plugin install clean-viz@maksymsherman-clean-viz-skill` | Install the skill in Claude Code |
+| `python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py --url ...` | Install the shared skill into Codex |
+| `uv run --with matplotlib --with numpy --with pandas python examples/mpg_five_charts.py` | Render the sample charts in [`examples/`](examples/) |
+| `python3 eval/check_response.py --case matplotlib-line response.md` | Check one saved response against a canonical case |
+| `python3 eval/check_response.py --responses-dir /path/to/responses` | Check a directory of saved responses in batch mode |
+| `uv run --with matplotlib ... python eval/verify_reference_examples.py` | Render and verify the runnable reference examples |
+
+---
 
 ## Configuration and Customization
 
-There is no standalone config file. The configuration surface is the skill itself.
+There is no standalone config file. The configuration surface is the skill itself:
 
 ```text
 skills/clean-viz/
@@ -213,9 +241,11 @@ skills/clean-viz/
 
 What to edit:
 
-- Change triggers, chart bans, or audit wording in [`skills/clean-viz/SKILL.md`](skills/clean-viz/SKILL.md)
-- Change reusable code patterns in [`skills/clean-viz/references/matplotlib-patterns.md`](skills/clean-viz/references/matplotlib-patterns.md), [`skills/clean-viz/references/plotly-patterns.md`](skills/clean-viz/references/plotly-patterns.md), or [`skills/clean-viz/references/general-patterns.md`](skills/clean-viz/references/general-patterns.md)
-- Change the final verification gate in [`skills/clean-viz/references/checklist.md`](skills/clean-viz/references/checklist.md)
+- **Triggers, chart bans, or audit wording** in [`SKILL.md`](skills/clean-viz/SKILL.md)
+- **Reusable code patterns** in [`matplotlib-patterns.md`](skills/clean-viz/references/matplotlib-patterns.md), [`plotly-patterns.md`](skills/clean-viz/references/plotly-patterns.md), or [`general-patterns.md`](skills/clean-viz/references/general-patterns.md)
+- **Final verification gate** in [`checklist.md`](skills/clean-viz/references/checklist.md)
+
+---
 
 ## Architecture
 
@@ -256,6 +286,8 @@ saved responses ----------> eval/check_response.py
 reference markdown -------> eval/verify_reference_examples.py
 ```
 
+---
+
 ## Troubleshooting
 
 ### The skill does not trigger
@@ -278,23 +310,27 @@ Use `python` instead for the installer or eval scripts if that is how your syste
 
 Batch mode expects filenames that match the case names in [`eval/cases/`](eval/cases/), for example `matplotlib-line.md`, `pie-substitution.md`, and `plotly-multi-line.md`.
 
+---
+
 ## Limitations
 
 - Primary support is deepest for matplotlib, seaborn, and Plotly. Altair, D3.js, ggplot2, and Observable Plot are useful secondary references, not equally deep implementations.
 - The skill can enforce honest reporting about rendered checks, but it cannot visually verify a chart that was never rendered.
 - The tracked eval harness is regex-based policy smoke testing, not semantic analysis and not a replacement for visual review.
 - The visual style is intentionally opinionated. If you need a brand-heavy marketing aesthetic, you will probably want to override parts of the house style.
-- This repository is a chart-generation skill, not a general dashboard framework or plotting library.
+- This is a chart-generation skill, not a general dashboard framework or plotting library.
+
+---
 
 ## FAQ
 
 ### Does it always refuse pie charts?
 
-Yes, by default. The skill explains why pie and donut charts are misleading in this style system and substitutes a horizontal bar chart or dot plot instead.
+Yes, by default. The skill explains why pie and donut charts are misleading and substitutes a horizontal bar chart or dot plot instead. If you insist after seeing the substitute, it complies but applies all other clean-viz rules.
 
 ### Can I override the rules?
 
-Yes. The skill allows explicit user overrides, but the default posture is to keep the stricter clean-viz behavior unless there is a strong reason to bend it.
+Yes. The skill allows explicit user overrides, but the default posture is to keep the stricter behavior unless there is a strong reason to bend it.
 
 ### Which libraries are best supported?
 
@@ -302,7 +338,7 @@ Matplotlib, seaborn, and Plotly are the strongest paths. Altair, D3.js, ggplot2,
 
 ### Does the repo include anything beyond the skill markdown?
 
-Yes. It also ships a tracked response-check harness in [`eval/`](eval/) and a runnable sample chart script in [`examples/mpg_five_charts.py`](examples/mpg_five_charts.py).
+Yes. It ships a tracked response-check harness in [`eval/`](eval/) and a runnable sample chart script in [`examples/mpg_five_charts.py`](examples/mpg_five_charts.py) that produces five example PNGs.
 
 ### What does the audit summary mean?
 
@@ -310,7 +346,17 @@ It is the final quality gate. Code checks are always required, rendered checks c
 
 ### Is there a bigger benchmark than the tracked smoke tests?
 
-Yes, but it is local-only. The heavier ChartBench workflow is documented in [`CLAUDE.md`](CLAUDE.md) and is not part of the published plugin payload.
+Yes, but it is local-only. The heavier ChartBench workflow (42 chart subtypes, 2,100 images) is documented in [`CLAUDE.md`](CLAUDE.md) and is not part of the published plugin payload.
+
+### Does the skill work with non-Python libraries?
+
+Yes. D3.js, ggplot2, and Observable Plot have reference patterns in [`general-patterns.md`](skills/clean-viz/references/general-patterns.md). The coverage is lighter than for the Python libraries but provides concrete code snippets for spine removal, serif fonts, and range frame equivalents.
+
+### What happens when I generate multiple charts in one session?
+
+The skill treats them as a unified visual system. It enforces consistent color assignments, typography, axis styling, and figure dimensions across all charts, and runs session-consistency checks as part of the audit gate.
+
+---
 
 ## About Contributions
 
